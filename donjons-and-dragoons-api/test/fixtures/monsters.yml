@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  type: 
+  source: MyString
+  max_hp: 1
+  current_hp: 1
+  xp_granted: 1
+  armor: MyString
+  weapon: MyString
+
+two:
+  name: MyString
+  type: 
+  source: MyString
+  max_hp: 1
+  current_hp: 1
+  xp_granted: 1
+  armor: MyString
+  weapon: MyString
