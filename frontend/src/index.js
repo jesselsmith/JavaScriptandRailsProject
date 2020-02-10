@@ -11,7 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("signup-div").classList.remove("hidden")
   })
 
-  doc
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault()
+    loginInfo = {
+      "user[username]": e.target.querySelector('[name="user[username]"').value,
+      "user[password]": e.target.querySelector('[name="user[password]"').value
+    }
+
+  })
 })
 
 async function fetchPoster(url, body) {
