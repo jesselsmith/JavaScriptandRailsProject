@@ -48,9 +48,14 @@ body {
     list-style: none;
     padding-right: 20px;
   }
+
+  span.session-btns {
+    float: right;
+    padding: 10px;
+  }
   
   button {
-    font-size: .65em;
+    font-size: 1em;
     color: #fff;
     background-color: green;
     border-radius: 10px;
@@ -73,3 +78,10 @@ body {
     }
   }
   
+  .hideable-form {
+    float: right;
+  }
+
+  .hidden {
+    display: none;
+  }
