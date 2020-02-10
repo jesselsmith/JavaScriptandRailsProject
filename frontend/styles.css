@@ -78,8 +78,30 @@ body {
     }
   }
   
+  label{
+    display: inline-block;
+    clear: left;
+    width: 28%;
+    text-align: right;
+  }
+  input {
+    display: inline-block;
+    clear: right;
+  }
+
+  input.user-login {
+    float: right;
+  }
+  #user-signup {
+    float: right;
+  }
   .hideable-form {
     float: right;
+    padding: 7px;
+    border-style: groove;
+  }
+  #signup-div {
+    width: 252px;
   }
 
   .hidden {

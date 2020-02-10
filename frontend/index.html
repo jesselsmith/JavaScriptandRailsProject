@@ -19,11 +19,11 @@
   </header>
   <div class="container hidden hideable-form" id="login-div">
     <form class="login-form">
-      <input type="text" placeholder="Username">
+      <input type="text" class="user-login" placeholder="Username">
       <br />
-      <input type="password" placeholder="Password">
+      <input type="password" class="user-login" placeholder="Password">
       <br />
-      <input type="submit" value="Log In" />
+      <input type="submit" class="user-login" value="Log In" />
     </form>
   </div>
   <div class="container hidden hideable-form" id="signup-div">
@@ -37,11 +37,10 @@
       <label for="user_password">Password: </label>
       <input type="password" name="user[password]" id="user_password" placeholder="Password">
       <br />
-      <label for="user_password_confirmation">Password Confirmation: </label>
+      <label for="user_password_confirmation">Confirm Password: </label>
       <input type="password" name="user[password_confirmation]" id="user_password_confirmation"
         placeholder="Password Confirmation">
-      <br />
-      <input type="submit" value="Sign Up" />
+      <input type="submit" id="user-signup" value="Sign Up" />
     </form>
   </div>
   <main>
