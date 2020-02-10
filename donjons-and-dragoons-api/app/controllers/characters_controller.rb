@@ -1,12 +1,12 @@
 class CharactersController < ApplicationController
+  before_action :authenticate_user!
   def create
-    character = Character.new(new_character_params(params))
+    character = current_user.characters.build(new_character_params(params))
     character.level = 1
     character.armor = "chainmail"
     character.weapon = "longsword"
     character.current_hp = character.max_hp
     charcter.xp = 0
-    character.user_id = current_user
     if character.save
       render json: character
     else
@@ -14,24 +14,16 @@ class CharactersController < ApplicationController
     end
   end
 
+  def show
+    render_character
+  end
+
   def destroy
-    character = find_character
-    if character
-      character.destroy
-      render json: character
-    else
-      render json: { message: "That character could not be found" }
-    end
+    render_character { character.destroy }
   end
 
   def update
-    character = find_character
-    if character
-      character.update(update_character_params(params))
-      render json: character
-    else
-      render json: { message: "That character could not be found" }
-    end
+    render_character { character.update(update_character_params(params)) }
   end
 
   private
@@ -42,6 +34,16 @@ class CharactersController < ApplicationController
 
   def update_character_params(params)
     params.require(:character).permit(:name, :level, :armor, :weapon, :current_hp, :xp)
+  end
+
+  def render_character
+    character = find_character
+    if character
+      yield
+      render json: character
+    else
+      render json: { message: "That character could not be found" }
+    end
   end
 
   def find_character
