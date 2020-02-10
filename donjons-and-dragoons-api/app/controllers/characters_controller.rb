@@ -10,12 +10,16 @@ class CharactersController < ApplicationController
     if character.save
       render json: character
     else
-      render json: { message: "There was an error in character creation" }
+      render json: { message: 'There was an error in character creation' }
     end
   end
 
   def show
     render_character
+  end
+
+  def index
+    render json: current_user.characters
   end
 
   def destroy
@@ -42,7 +46,7 @@ class CharactersController < ApplicationController
       yield
       render json: character
     else
-      render json: { message: "That character could not be found" }
+      render json: { message: 'That character could not be found' }
     end
   end
 
