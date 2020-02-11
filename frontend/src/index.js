@@ -35,16 +35,15 @@ function setUpSignUpForm() {
   document.getElementById("signup-form").addEventListener("submit", e => {
     e.preventDefault()
     signupInfo = {
-      "user": {
-        "email": e.target.querySelector("#user_email").value,
-        "username": e.target.querySelector("#user_username").value,
-        "password": e.target.querySelector("#user_password").value,
-        "password_confirmation": e.target.querySelector("#user_password_confirmation").value
-      }
+      "email": e.target.querySelector("#user_email").value,
+      "username": e.target.querySelector("#user_username").value,
+      "password": e.target.querySelector("#user_password").value,
+      "password_confirmation": e.target.querySelector("#user_password_confirmation").value
     }
-    fetchPoster(BASE_URL + "/users", signupInfo)
+    debugger
+    fetchPoster(BASE_URL + "/auth", signupInfo)
       .then(processLogin)
-    e.reset()
+    e.target.reset()
   }, false)
 }
 
@@ -52,12 +51,10 @@ function setUpLoginForm() {
   document.getElementById("login-form").addEventListener("submit", e => {
     e.preventDefault()
     loginInfo = {
-      user: {
-        "username": e.target.querySelector('[name="user[username]"').value,
-        "password": e.target.querySelector('[name="user[password]"').value
-      }
+      "email": e.target.querySelector('[name="user[email]"').value,
+      "password": e.target.querySelector('[name="user[password]"').value
     }
-    fetchPoster(BASE_URL + "/users/sign_in", loginInfo)
+    fetchPoster(BASE_URL + "/auth/sign_in", loginInfo)
       .then(processLogin)
     e.target.reset()
   }, false)
