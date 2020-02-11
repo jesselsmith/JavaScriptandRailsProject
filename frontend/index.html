@@ -12,13 +12,17 @@
     <span>
       <h2 class="title">Donjons and Dragoons!</h2>
     </span>
-    <span class="session-btns">
+    <span class="session-btns" id="new-session-btns">
       <button class="btn" id="signup-btn">Sign Up</button>
       <button class="btn" id="login-btn">Log In</button>
     </span>
+    <span class="session-btns hidden" id="logged-in-span">
+      <span id="welcome-text"></span>
+      <button class="btn" id="logout-btn">Log Out</button>
+    </span>
   </header>
   <div class="container hidden hideable-form" id="login-div">
-    <form class="login-form">
+    <form id="login-form">
       <input type="text" class="user-login" name="user[username]" placeholder="Username">
       <br />
       <input type="password" class="user-login" name="user[password]" placeholder="Password">
@@ -27,7 +31,7 @@
     </form>
   </div>
   <div class="container hidden hideable-form" id="signup-div">
-    <form class="signup-form">
+    <form id="signup-form">
       <label for="user_email">Email: </label>
       <input type="email" name="user[email]" id="user_email" placeholder="your@email.com">
       <br />
