@@ -48,7 +48,16 @@
     </form>
   </div>
   <main>
-
+    <div class="container hidden" id="new-character">
+      <button id="new-character-btn">New Character</button>
+      <span class="hidden" id="new-character-span">
+        <form id="new-character-form">
+          <label for="name">Name: </label>
+          <input type="text" name="name" id="character_name">
+          <input type="submit" value="Add Character">
+        </form>
+      </span>
+    </div>
   </main>
 
   <script src="./src/index.js"></script>

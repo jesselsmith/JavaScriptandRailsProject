@@ -2,28 +2,36 @@ const BASE_URL = "http://localhost:3000"
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("login-btn").addEventListener("click", () => {
-    document.getElementById("signup-div").classList.add("hidden")
-    document.getElementById("login-div").classList.remove("hidden")
-  })
+  setUpSignUpAndLogInButtons()
+  setUpSignUpAndLoginForms()
+
+})
+
+function setUpSignUpAndLogInButtons() {
+  setUpSignUpButton()
+  setUpLoginButton()
+}
+
+function setUpSignUpButton() {
   document.getElementById("signup-btn").addEventListener("click", () => {
     document.getElementById("login-div").classList.add("hidden")
     document.getElementById("signup-div").classList.remove("hidden")
   })
+}
 
-  document.getElementById("login-form").addEventListener("submit", e => {
-    e.preventDefault()
-    loginInfo = {
-      user: {
-        "username": e.target.querySelector('[name="user[username]"').value,
-        "password": e.target.querySelector('[name="user[password]"').value
-      }
-    }
-    fetchPoster(BASE_URL + "/users/sign_in", loginInfo)
-      .then(processLogin)
-    e.target.reset()
+function setUpLoginButton() {
+  document.getElementById("login-btn").addEventListener("click", () => {
+    document.getElementById("signup-div").classList.add("hidden")
+    document.getElementById("login-div").classList.remove("hidden")
   })
+}
 
+function setUpSignUpAndLoginForms() {
+  setUpSignUpForm()
+  setUpLoginForm()
+}
+
+function setUpSignUpForm() {
   document.getElementById("signup-form").addEventListener("submit", e => {
     e.preventDefault()
     signupInfo = {
@@ -38,7 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(processLogin)
     e.reset()
   }, false)
-})
+}
+
+function setUpLoginForm() {
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault()
+    loginInfo = {
+      user: {
+        "username": e.target.querySelector('[name="user[username]"').value,
+        "password": e.target.querySelector('[name="user[password]"').value
+      }
+    }
+    fetchPoster(BASE_URL + "/users/sign_in", loginInfo)
+      .then(processLogin)
+    e.target.reset()
+  }, false)
+}
 
 async function fetchPoster(url, body) {
   const resp = await fetch(url, {
@@ -56,10 +79,19 @@ function processLogin(json) {
   if (json.username) {
     document.getElementById("welcome-text").textContent = `Welcome, ${json.username}!`
     //hide login and sign up buttons and forms while logged in
-    document.getElementById("new-session-btns").classList.add("hidden")
-    document.getElementById("signup-div").classList.add("hidden")
-    document.getElementById("login-div").classList.add("hidden")
+    hideButtonsAndForms()
     //show text welcoming user and logout button while logged in
     document.getElementById('logged-in-span').classList.remove("hidden")
+    //show new character button
+    function setUpNewCharacterButton()
+    document.getElementById("new-character").classList.remove("hidden")
   }
+}
+
+function setUpNewCharacterButton()
+
+function hideButtonsAndForms() {
+  document.getElementById("new-session-btns").classList.add("hidden")
+  document.getElementById("signup-div").classList.add("hidden")
+  document.getElementById("login-div").classList.add("hidden")
 }
