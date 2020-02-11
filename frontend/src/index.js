@@ -40,7 +40,6 @@ function setUpSignUpForm() {
       "password": e.target.querySelector("#user_password").value,
       "password_confirmation": e.target.querySelector("#user_password_confirmation").value
     }
-    debugger
     fetchPoster(BASE_URL + "/auth", signupInfo)
       .then(processLogin)
     e.target.reset()
@@ -65,7 +64,7 @@ async function fetchPoster(url, body) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json"
+      "Access-Control-Expose-Headers": 'Authorization'
     },
     body: JSON.stringify(body)
   })
@@ -73,8 +72,9 @@ async function fetchPoster(url, body) {
 }
 
 function processLogin(json) {
-  if (json.username) {
-    document.getElementById("welcome-text").textContent = `Welcome, ${json.username}!`
+  debugger
+  if (json) {
+    document.getElementById("welcome-text").textContent = `Welcome, ${json.nickname}!`
     //hide login and sign up buttons and forms while logged in
     hideButtonsAndForms()
     //show text welcoming user and logout button while logged in
