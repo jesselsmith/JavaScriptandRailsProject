@@ -7,4 +7,6 @@ class User < ApplicationRecord
   has_many :characters
 
   validates :username, presence: true, uniqueness: true
+
+  include DeviseTokenAuth::Concerns::User
 end

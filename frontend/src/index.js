@@ -83,15 +83,34 @@ function processLogin(json) {
     //show text welcoming user and logout button while logged in
     document.getElementById('logged-in-span').classList.remove("hidden")
     //show new character button
-    function setUpNewCharacterButton()
+    setUpNewCharacterButton()
     document.getElementById("new-character").classList.remove("hidden")
   }
 }
-
-function setUpNewCharacterButton()
 
 function hideButtonsAndForms() {
   document.getElementById("new-session-btns").classList.add("hidden")
   document.getElementById("signup-div").classList.add("hidden")
   document.getElementById("login-div").classList.add("hidden")
+}
+
+function setUpNewCharacterButton() {
+  document.getElementById("new-character-btn").addEventListener("click", () => {
+    document.getElementById("new-character-form").addEventListener("submit", e => {
+      e.preventDefault()
+      newCharInfo = {
+        character: {
+          name: e.target.querySelector("#character_name").value
+        }
+      }
+      fetchPoster(BASE_URL + "/characters", newCharInfo)
+        .then(processNewCharacter)
+    }, false)
+    document.getElementById("new-character-span").classList.remove("hidden")
+
+  })
+}
+
+function processNewCharacter(json) {
+  console.log(json)
 }

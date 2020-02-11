@@ -17,6 +17,8 @@ gem 'puma', '~> 3.11'
 gem 'bcrypt', '~> 3.1.7'
 # User account management
 gem 'devise'
+# token authentication with devise
+gem 'devise_token_auth'
 
 
 # Use Active Storage variant
