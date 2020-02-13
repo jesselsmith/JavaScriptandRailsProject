@@ -38,10 +38,9 @@ module DonjonsAndDragoonsApi
       allow do
         origins '*'
         resource '*',
-          headers: %w(Authorization),
-          methods: :any,
-          expose: %w(Authorization),
-          max_age: 6000
+          headers: :any, 
+          expose: ['Authorization'],
+          methods: :any
       end
     end
   end

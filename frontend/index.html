@@ -34,9 +34,9 @@
     <form id="signup-form">
       <label for="user_email">Email: </label>
       <input type="email" name="user[email]" id="user_email" placeholder="your@email.com">
-      <br />
+      <!-- <br />
       <label for="user_username">Username: </label>
-      <input type="text" name="user[username]" id="user_username" placeholder="Username">
+      <input type="text" name="user[username]" id="user_username" placeholder="Username"> -->
       <br />
       <label for="user_password">Password: </label>
       <input type="password" name="user[password]" id="user_password" placeholder="Password">
@@ -48,15 +48,22 @@
     </form>
   </div>
   <main>
-    <div class="container hidden" id="new-character">
-      <button id="new-character-btn">New Character</button>
-      <span class="hidden" id="new-character-span">
-        <form id="new-character-form">
-          <label for="name">Name: </label>
-          <input type="text" name="name" id="character_name">
-          <input type="submit" value="Add Character">
-        </form>
-      </span>
+    <div class="container" id="character-menu">
+      <div class="container hidden" id="new-character">
+        <button id="new-character-btn">New Character</button>
+        <span class="hidden" id="new-character-span">
+          <form id="new-character-form">
+            <label for="name">Name: </label>
+            <input type="text" name="name" id="character_name">
+            <input type="submit" value="Add Character">
+          </form>
+        </span>
+      </div>
+      <div class="container hidden" id="character-list-div">
+        <ul id="character-list">
+
+        </ul>
+      </div>
     </div>
   </main>
 

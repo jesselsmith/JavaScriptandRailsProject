@@ -1,11 +1,12 @@
 class ApplicationController < ActionController::API
+  include ActionController::MimeResponds
   respond_to :json
 
   private
 
   def render_resource(resource)
     if resource.errors.empty?
-      render json: resource
+      render json: resource, include: [:characters]
     else
       validation_error(resource)
     end

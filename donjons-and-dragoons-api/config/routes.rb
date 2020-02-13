@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users,  controllers: { registrations: 'registrations' }
+  devise_for :users, controllers: { sessions: 'sessions', registrations: 'registrations' }, defaults: { format: :json }
   resources :monsters
   resources :characters, only: [:index, :show, :create, :update, :destroy]
   root 'home#index'

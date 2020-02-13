@@ -1,12 +1,15 @@
 class CharactersController < ApplicationController
+  respond_to :json
+
   before_action :authenticate_user!
   def create
     character = current_user.characters.build(new_character_params(params))
     character.level = 1
     character.armor = "chainmail"
     character.weapon = "longsword"
+    binding.pry
     character.current_hp = character.max_hp
-    charcter.xp = 0
+    character.xp = 0
     if character.save
       render json: character
     else
