@@ -121,12 +121,10 @@ function switchLoggedInButonsAndForms() {
   const loggedInClassList = document.getElementById('logged-in-span').classList
   if (loggedInClassList.contains("hidden")) {
     loggedInClassList.remove("hidden")
-    document.getElementById("new-character-div").classList.remove("hidden")
-    document.getElementById("character-list-div").classList.remove("hidden")
+    document.getElementById("character-menu").classList.remove("hidden")
   } else {
     loggedInClassList.add("hidden")
-    document.getElementById("new-character-div").classList.add("hidden")
-    document.getElementById("character-list-div").classList.add("hidden")
+    document.getElementById("character-menu").classList.add("hidden")
     document.getElementById("new-character-span").classList.add("hidden")
   }
 }
@@ -142,6 +140,7 @@ function setUpNewCharacterButton() {
       }
       fetchPoster(BASE_URL + "/characters", newCharInfo, true)
         .then(processNewCharacter)
+      document.getElementById("new-character-span").classList.add("hidden")
       e.target.reset()
     }, false)
     document.getElementById("new-character-span").classList.remove("hidden")
@@ -174,10 +173,10 @@ function createCharacterDeleteButton(character) {
       setToken.call(resp)
       const li = e.target.parentElement
       li.parentElement.removeChild(li)
-      return resp.json()
-    }).then(json => console.log(json))
+    })
   })
-  deleteButton.textContent = '♻'
+  deleteButton.classList.add("delete")
+  deleteButton.textContent = 'X'
   return deleteButton
 }
 

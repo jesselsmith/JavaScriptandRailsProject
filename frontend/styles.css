@@ -61,8 +61,7 @@ body {
     border-radius: 10px;
   }
   
-  button.release {
-    float: right;
+  button.delete {
     background-color: #E1332D;
   }
   
