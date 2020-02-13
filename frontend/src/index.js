@@ -88,31 +88,47 @@ function processLogin(json) {
   if (json.data) {
     //generate welcome text
     document.getElementById("welcome-text").textContent = `Welcome, ${json.data.attributes.email}!`
-    //hide login and sign up buttons and forms while logged in
-    hideButtonsAndForms()
-    //show text welcoming user and logout button while logged in
-    document.getElementById('logged-in-span').classList.remove("hidden")
+
+
     //show new character button
     setUpNewCharacterButton()
-    document.getElementById("new-character").classList.remove("hidden")
-    //prepare and display list of user's characters
+    //prepare list of user's characters
     setUpCharacterList(json.included)
-    document.getElementById("character-list-div").classList.remove("hidden")
+    //remove buttons and forms for when a user is logged out, display correct buttons and forms for when a user logs in
+    switchButtonsAndForms()
   } else {
     console.log(json)
   }
 }
 
 function switchButtonsAndForms() {
-  const buttons = document.getElementById("new-session-btns")
-  if (buttons.classList.includes("hidden")) {
+  switchLoggedOutButtonsAndForms()
+  switchLoggedInButonsAndForms()
+}
+
+function switchLoggedOutButtonsAndForms() {
+  const buttonsClassList = document.getElementById("new-session-btns").classList
+  if (buttonsClassList.includes("hidden")) {
     buttons.classList.remove("hidden")
     document.getElementById("signup-div").classList.remove("hidden")
     document.getElementById("login-div").classList.remove("hidden")
   } else {
-    buttons.classList.add("hidden")
+    buttonsClassList.add("hidden")
     document.getElementById("signup-div").classList.add("hidden")
     document.getElementById("login-div").classList.add("hidden")
+  }
+}
+
+function switchLoggedInButonsAndForms() {
+  const loggedInClassList = document.getElementById('logged-in-span').classList
+  if (loggedInClassList.includes("hidden")) {
+    loggedInClassList.remove("hidden")
+    document.getElementById("new-character").classList.remove("hidden")
+    document.getElementById("character-list-div").classList.remove("hidden")
+  } else {
+    loggedInClassList.add("hidden")
+    document.getElementById("new-character").classList.add("hidden")
+    document.getElementById("character-list-div").classList.add("hidden")
   }
 }
 
@@ -160,8 +176,8 @@ function setUpLogOutButton() {
     }).then(resp => {
       setToken.call(resp)
       return resp.json()
-    }).then(json => {
-
+    }).then(() => {
+      switchButtonsAndForms()
     }
     )
   })
