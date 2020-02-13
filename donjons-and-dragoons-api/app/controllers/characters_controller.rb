@@ -25,11 +25,11 @@ class CharactersController < ApplicationController
   end
 
   def destroy
-    render_character { character.destroy }
+    render_character { @character.destroy }
   end
 
   def update
-    render_character { character.update(update_character_params(params)) }
+    render_character { @character.update(update_character_params(params)) }
   end
 
   private
@@ -43,10 +43,10 @@ class CharactersController < ApplicationController
   end
 
   def render_character
-    character = find_character
-    if character
+    @character = find_character
+    if @character
       yield
-      render json: CharacterSerializer.new(character)
+      render json: CharacterSerializer.new(@character)
     else
       render json: { message: 'That character could not be found' }
     end
