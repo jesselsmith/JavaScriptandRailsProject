@@ -121,12 +121,13 @@ function switchLoggedInButonsAndForms() {
   const loggedInClassList = document.getElementById('logged-in-span').classList
   if (loggedInClassList.contains("hidden")) {
     loggedInClassList.remove("hidden")
-    document.getElementById("new-character").classList.remove("hidden")
+    document.getElementById("new-character-div").classList.remove("hidden")
     document.getElementById("character-list-div").classList.remove("hidden")
   } else {
     loggedInClassList.add("hidden")
-    document.getElementById("new-character").classList.add("hidden")
+    document.getElementById("new-character-div").classList.add("hidden")
     document.getElementById("character-list-div").classList.add("hidden")
+    document.getElementById("new-character-span").classList.add("hidden")
   }
 }
 
@@ -153,9 +154,31 @@ function setUpCharacterList(characters) {
 
 function addCharacterToList(character) {
   ul = document.getElementById("character-list")
-  li = document.createElement('li')
+  const li = document.createElement('li')
   li.textContent = `${character.attributes.name} Level: ${character.attributes.level} HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
+  li.appendChild(createCharacterDeleteButton(character))
   ul.appendChild(li)
+}
+
+function createCharacterDeleteButton(character) {
+  const deleteButton = document.createElement('button')
+  deleteButton.addEventListener('click', e => {
+    fetch(`${BASE_URL}/characters/${character.id}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": currentToken
+      }
+    }).then(resp => {
+      setToken.call(resp)
+      const li = e.target.parentElement
+      li.parentElement.removeChild(li)
+      return resp.json()
+    }).then(json => console.log(json))
+  })
+  deleteButton.textContent = '♻'
+  return deleteButton
 }
 
 function processNewCharacter(json) {

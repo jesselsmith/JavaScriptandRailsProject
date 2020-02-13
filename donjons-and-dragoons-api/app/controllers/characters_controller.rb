@@ -46,7 +46,7 @@ class CharactersController < ApplicationController
     character = find_character
     if character
       yield
-      render json: character
+      render json: CharacterSerializer.new(character)
     else
       render json: { message: 'That character could not be found' }
     end
