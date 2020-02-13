@@ -24,6 +24,10 @@ gem 'devise-jwt'
 
 gem 'dotenv-rails'
 
+gem 'fast_jsonapi'
+
+gem 'require_all'
+
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

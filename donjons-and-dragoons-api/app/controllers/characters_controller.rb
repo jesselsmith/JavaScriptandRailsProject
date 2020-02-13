@@ -7,11 +7,10 @@ class CharactersController < ApplicationController
     character.level = 1
     character.armor = "chainmail"
     character.weapon = "longsword"
-    binding.pry
     character.current_hp = character.max_hp
     character.xp = 0
     if character.save
-      render json: character
+      render json: CharacterSerializer.new(character)
     else
       render json: { message: 'There was an error in character creation' }
     end
