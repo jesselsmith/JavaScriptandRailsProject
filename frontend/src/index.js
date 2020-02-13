@@ -108,10 +108,8 @@ function switchButtonsAndForms() {
 
 function switchLoggedOutButtonsAndForms() {
   const buttonsClassList = document.getElementById("new-session-btns").classList
-  if (buttonsClassList.includes("hidden")) {
-    buttons.classList.remove("hidden")
-    document.getElementById("signup-div").classList.remove("hidden")
-    document.getElementById("login-div").classList.remove("hidden")
+  if (buttonsClassList.contains("hidden")) {
+    buttonsClassList.remove("hidden")
   } else {
     buttonsClassList.add("hidden")
     document.getElementById("signup-div").classList.add("hidden")
@@ -121,7 +119,7 @@ function switchLoggedOutButtonsAndForms() {
 
 function switchLoggedInButonsAndForms() {
   const loggedInClassList = document.getElementById('logged-in-span').classList
-  if (loggedInClassList.includes("hidden")) {
+  if (loggedInClassList.contains("hidden")) {
     loggedInClassList.remove("hidden")
     document.getElementById("new-character").classList.remove("hidden")
     document.getElementById("character-list-div").classList.remove("hidden")
@@ -165,7 +163,7 @@ function processNewCharacter(json) {
 }
 
 function setUpLogOutButton() {
-  document.getElementById("logout-btn").addEventListener("click", e => {
+  document.getElementById("logout-btn").addEventListener("click", () => {
     fetch(BASE_URL + "/users/sign_out", {
       method: 'DELETE',
       headers: {
@@ -175,10 +173,12 @@ function setUpLogOutButton() {
       }
     }).then(resp => {
       setToken.call(resp)
-      return resp.json()
-    }).then(() => {
+      removeCharactersFromList()
       switchButtonsAndForms()
-    }
-    )
+    })
   })
+}
+
+function removeCharactersFromList() {
+  document.getElementById("character-list").innerHTML = ''
 }
