@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount_devise_token_auth_for 'User', at: 'auth'
+  devise_for :users
   resources :monsters
   resources :characters, only: [:index, :show, :create, :update, :destroy]
   root 'home#index'

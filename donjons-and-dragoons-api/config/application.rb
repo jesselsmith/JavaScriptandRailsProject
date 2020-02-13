@@ -34,13 +34,14 @@ module DonjonsAndDragoonsApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.use Rack::Cors do
+    config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins '*'
         resource '*',
-          headers: :any, 
-          expose: ['Authorization', 'access-token', 'expiry', 'token-type', 'uid', 'client'],
-          methods: [:get, :post, :patch, :delete, :options]
+          headers: %w(Authorization),
+          methods: :any,
+          expose: %w(Authorization),
+          max_age: 6000
       end
     end
   end
