@@ -4,7 +4,7 @@ let currentToken = ""
 document.addEventListener("DOMContentLoaded", () => {
   setUpSignUpAndLogInButtons()
   setUpSignUpAndLoginForms()
-
+  setUpLogOutButton()
 })
 
 function setUpSignUpAndLogInButtons() {
@@ -75,14 +75,19 @@ async function fetchPoster(url, body, token = false) {
     headers: headers,
     body: JSON.stringify(body)
   })
-  currentToken = resp.headers.get('Authorization') || currentToken
+  setToken.call(resp)
   return await resp.json()
 }
 
+function setToken() {
+  currentToken = this.headers.get('Authorization') || currentToken
+}
+
+
 function processLogin(json) {
-  if (json.email) {
+  if (json.data) {
     //generate welcome text
-    document.getElementById("welcome-text").textContent = `Welcome, ${json.email}!`
+    document.getElementById("welcome-text").textContent = `Welcome, ${json.data.attributes.email}!`
     //hide login and sign up buttons and forms while logged in
     hideButtonsAndForms()
     //show text welcoming user and logout button while logged in
@@ -91,17 +96,24 @@ function processLogin(json) {
     setUpNewCharacterButton()
     document.getElementById("new-character").classList.remove("hidden")
     //prepare and display list of user's characters
-    setUpCharacterList(json)
+    setUpCharacterList(json.included)
     document.getElementById("character-list-div").classList.remove("hidden")
   } else {
     console.log(json)
   }
 }
 
-function hideButtonsAndForms() {
-  document.getElementById("new-session-btns").classList.add("hidden")
-  document.getElementById("signup-div").classList.add("hidden")
-  document.getElementById("login-div").classList.add("hidden")
+function switchButtonsAndForms() {
+  const buttons = document.getElementById("new-session-btns")
+  if (buttons.classList.includes("hidden")) {
+    buttons.classList.remove("hidden")
+    document.getElementById("signup-div").classList.remove("hidden")
+    document.getElementById("login-div").classList.remove("hidden")
+  } else {
+    buttons.classList.add("hidden")
+    document.getElementById("signup-div").classList.add("hidden")
+    document.getElementById("login-div").classList.add("hidden")
+  }
 }
 
 function setUpNewCharacterButton() {
@@ -115,21 +127,42 @@ function setUpNewCharacterButton() {
       }
       fetchPoster(BASE_URL + "/characters", newCharInfo, true)
         .then(processNewCharacter)
+      e.target.reset()
     }, false)
     document.getElementById("new-character-span").classList.remove("hidden")
-
   })
 }
 
-function setUpCharacterList(json) {
-
-  json.characters.forEach(addCharacterToList)
+function setUpCharacterList(characters) {
+  characters.forEach(addCharacterToList)
 }
 
 function addCharacterToList(character) {
   ul = document.getElementById("character-list")
+  li = document.createElement('li')
+  li.textContent = `${character.attributes.name} Level: ${character.attributes.level} HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
+  ul.appendChild(li)
 }
 
 function processNewCharacter(json) {
-  console.log(json)
+  addCharacterToList(json.data)
+}
+
+function setUpLogOutButton() {
+  document.getElementById("logout-btn").addEventListener("click", e => {
+    fetch(BASE_URL + "/users/sign_out", {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": currentToken
+      }
+    }).then(resp => {
+      setToken.call(resp)
+      return resp.json()
+    }).then(json => {
+
+    }
+    )
+  })
 }
