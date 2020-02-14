@@ -134,7 +134,7 @@ function switchLoggedInElements() {
     loggedInClassList.add("hidden")
     document.getElementById("character-menu").classList.add("hidden")
     document.getElementById("new-character-span").classList.add("hidden")
-    document.getElementById('game-summary').classList.remove("hidden")
+    document.getElementById('game-summary').classList.add("hidden")
   }
 }
 
@@ -165,7 +165,7 @@ function addCharacterToList(character) {
   const li = document.createElement('li')
   li.appendChild(createCharacterDeleteButton(character))
   li.appendChild(document.createTextNode(`${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`))
-  li.appendChiled(createPlayButton(character))
+  li.appendChild(createPlayButton(character))
   ul.appendChild(li)
 }
 
@@ -191,6 +191,8 @@ function createPlayButton(character) {
   playButton.addEventListener('click', e => {
 
   })
+  playButton.textContent = `Play as ${character.attributes.name}`
+  return playButton
 }
 
 function processNewCharacter(json) {
@@ -219,7 +221,7 @@ class ActiveCharacter {
     this._id = character.id
     this._name = character.attributes.name
     this._level = character.attributes.level
-    this._current_hp = character.attributes.current_hp
+    this._currentHp = character.attributes.current_hp
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
@@ -229,8 +231,53 @@ class ActiveCharacter {
     return this._name
   }
 
-  set name() {
+  get level() {
+    return this._level
+  }
+
+  get currentHp() {
+    return this._currentHp
+  }
+
+  get armor() {
+    return this._armor
+  }
+
+  get weapon() {
+    return this._weapon
+  }
+
+  get xp() {
+    return this._xp
+  }
+
+  set currentHp(newHp) {
 
   }
 
+  gain_xp(xpGained) {
+    this._xp = this._updateCharacter('xp', this._xp + xpGained)
+  }
+
+  _updateCharacter(fieldToUpdate, newValue) {
+    const character = {}
+    character[fieldToUpdate] = newValue
+    fetch(BASE_URL + `/characters/${this._id}`, {
+      method: "PATCH",
+      headers: HEADERS,
+      body: JSON.stringify(character)
+    })
+      .then(resp => {
+        setToken.call(resp)
+        resp.json()
+      })
+      .then(json => {
+        if (json.data) {
+          return json.data.attributes[fieldToUpdate]
+        } else {
+          console.log(json)
+          return this['_' + fieldToUpdate]
+        }
+      })
+  }
 }
