@@ -1,5 +1,10 @@
 const BASE_URL = "http://localhost:3000"
 let currentToken = ""
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "Authorization": currentToken
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   setUpSignUpAndLogInButtons()
@@ -154,8 +159,9 @@ function setUpCharacterList(characters) {
 function addCharacterToList(character) {
   ul = document.getElementById("character-list")
   const li = document.createElement('li')
-  li.textContent = `${character.attributes.name} Level: ${character.attributes.level} HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   li.appendChild(createCharacterDeleteButton(character))
+  li.appendChild(document.createTextNode(`${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`))
+  li.appendChiled(createPlayButton(character))
   ul.appendChild(li)
 }
 
@@ -164,11 +170,7 @@ function createCharacterDeleteButton(character) {
   deleteButton.addEventListener('click', e => {
     fetch(`${BASE_URL}/characters/${character.id}`, {
       method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": currentToken
-      }
+      headers: HEADERS
     }).then(resp => {
       setToken.call(resp)
       const li = e.target.parentElement
@@ -188,11 +190,7 @@ function setUpLogOutButton() {
   document.getElementById("logout-btn").addEventListener("click", () => {
     fetch(BASE_URL + "/users/sign_out", {
       method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": currentToken
-      }
+      headers: HEADERS
     }).then(resp => {
       setToken.call(resp)
       removeCharactersFromList()
