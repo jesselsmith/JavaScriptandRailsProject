@@ -253,8 +253,73 @@ class ActiveCharacter {
     this._current_hp = this._updateCharacter('current_hp', newHp)
   }
 
+  set armor(newArmor) {
+    this.armor = this._updateCharacter('armor', newArmor)
+  }
+
+  set weapon(newWeapon) {
+    this.weapon = this._updateCharacter('weapon', newWeapon)
+  }
+
   gain_xp(xpGained) {
     this._xp = this._updateCharacter('xp', this._xp + xpGained)
+  }
+
+  static rollDie(dieSize) {
+    return Math.floor(Math.random() * dieSize) + 1
+  }
+
+  get max_hp() {
+    4 + this._level * 9
+  }
+
+  get proficiency() {
+    Math.ceiling(this._level / 4) + 1
+  }
+
+  get attackBonus() {
+    return this.proficiency + this.strengthBonus
+  }
+
+
+  get strengthBonus() {
+    if (this._level >= 6) {
+      return 5
+    } else if (this.level >= 4) {
+      return 4
+    } else {
+      return 3
+    }
+  }
+
+  get damageRoll() {
+    let damageRoll = this.strengthBonus
+    switch (this.weapon) {
+      case 'longsword':
+        damageRoll += rollDie(8)
+        break
+      case 'halberd':
+        damageRoll += rollDie(10)
+        break
+      case 'lance':
+        damageRoll += rollDie(12)
+        break
+      case 'greatsword':
+        damageRoll += rollDie(6) + rollDie(6)
+        break
+      default:
+        damageRoll += 1
+    }
+    return damageRoll
+  }
+
+  attack(monster) {
+    const attackRoll = rollDie(20) + this.attackBonus
+    if (attackRoll >= monster.armorClass) {
+      const damage = this.damageRoll
+      monster.currentHp -= damage
+
+    }
   }
 
   _updateCharacter(fieldToUpdate, newValue) {
