@@ -106,3 +106,7 @@ body {
   .hidden {
     display: none;
   }
+
+  #game-event-display{
+    overflow: scroll;
+  }

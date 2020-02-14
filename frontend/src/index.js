@@ -214,6 +214,11 @@ function removeCharactersFromList() {
   document.getElementById("character-list").innerHTML = ''
 }
 
+function addGameEvent(text) {
+  gameEventDisplay = document.getElementById('game-event-display')
+  gameEventDisplay.textContent = text + gameEventDisplay.textContent
+}
+
 class ActiveCharacter {
   constructor(character) {
     this._id = character.id
@@ -295,6 +300,9 @@ class ActiveCharacter {
   get damageRoll() {
     let damageRoll = this.strengthBonus
     switch (this.weapon) {
+      case 'shortsword':
+        damageRoll += rollDie(6)
+        break
       case 'longsword':
         damageRoll += rollDie(8)
         break
@@ -313,12 +321,22 @@ class ActiveCharacter {
     return damageRoll
   }
 
-  attack(monster) {
-    const attackRoll = rollDie(20) + this.attackBonus
+  advantageRoll(advantage) {
+    let rollResult = rollDie(20)
+    if (advantage === 'advantage') {
+      rollResult = Math.max(rollResult, rollDie(20))
+    } else if (advantage === 'disadvantage') {
+      rollResult = Math.min(rollResult, rollDie(20))
+    }
+    return rollResult
+  }
+
+  attack(monster, advantage = 'straight') {
+    const attackRoll = this.attackBonus + this.advantageRoll(advantage)
     if (attackRoll >= monster.armorClass) {
       const damage = this.damageRoll
       monster.currentHp -= damage
-
+      addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
     }
   }
 
