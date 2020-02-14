@@ -297,9 +297,20 @@ class ActiveCharacter {
     }
   }
 
+  get armorClass() {
+    switch (this._armor) {
+      case 'chain mail':
+        return 16
+      case 'splint mail':
+        return 17
+      case 'plate mail':
+        return 18
+    }
+  }
+
   get damageRoll() {
     let damageRoll = this.strengthBonus
-    switch (this.weapon) {
+    switch (this._weapon) {
       case 'shortsword':
         damageRoll += rollDie(6)
         break

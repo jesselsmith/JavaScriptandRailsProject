@@ -5,7 +5,7 @@ class CharactersController < ApplicationController
   def create
     character = current_user.characters.build(new_character_params(params))
     character.level = 1
-    character.armor = "chainmail"
+    character.armor = "chain mail"
     character.weapon = "longsword"
     character.current_hp = character.max_hp
     character.xp = 0
