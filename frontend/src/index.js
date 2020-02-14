@@ -129,12 +129,10 @@ function switchLoggedInElements() {
   if (loggedInClassList.contains("hidden")) {
     loggedInClassList.remove("hidden")
     document.getElementById("character-menu").classList.remove("hidden")
-    document.getElementById('game-summary').classList.remove("hidden")
   } else {
     loggedInClassList.add("hidden")
     document.getElementById("character-menu").classList.add("hidden")
     document.getElementById("new-character-span").classList.add("hidden")
-    document.getElementById('game-summary').classList.add("hidden")
   }
 }
 
@@ -221,7 +219,7 @@ class ActiveCharacter {
     this._id = character.id
     this._name = character.attributes.name
     this._level = character.attributes.level
-    this._currentHp = character.attributes.current_hp
+    this._current_hp = character.attributes.current_hp
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
@@ -236,7 +234,7 @@ class ActiveCharacter {
   }
 
   get currentHp() {
-    return this._currentHp
+    return this._current_hp
   }
 
   get armor() {
@@ -252,7 +250,7 @@ class ActiveCharacter {
   }
 
   set currentHp(newHp) {
-
+    this._current_hp = this._updateCharacter('current_hp', newHp)
   }
 
   gain_xp(xpGained) {
