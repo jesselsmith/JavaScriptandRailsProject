@@ -100,37 +100,41 @@ function processLogin(json) {
     //prepare list of user's characters
     setUpCharacterList(json.included)
     //remove buttons and forms for when a user is logged out, display correct buttons and forms for when a user logs in
-    switchButtonsAndForms()
+    switchDisplayElements()
   } else {
     console.log(json)
   }
 }
 
-function switchButtonsAndForms() {
-  switchLoggedOutButtonsAndForms()
-  switchLoggedInButonsAndForms()
+function switchDisplayElements() {
+  switchLoggedOutElements()
+  switchLoggedInElements()
 }
 
-function switchLoggedOutButtonsAndForms() {
+function switchLoggedOutElements() {
   const buttonsClassList = document.getElementById("new-session-btns").classList
   if (buttonsClassList.contains("hidden")) {
     buttonsClassList.remove("hidden")
+    document.getElementById('login-message').classList.remove('hidden')
   } else {
     buttonsClassList.add("hidden")
     document.getElementById("signup-div").classList.add("hidden")
     document.getElementById("login-div").classList.add("hidden")
+    document.getElementById('login-message').classList.add('hidden')
   }
 }
 
-function switchLoggedInButonsAndForms() {
+function switchLoggedInElements() {
   const loggedInClassList = document.getElementById('logged-in-span').classList
   if (loggedInClassList.contains("hidden")) {
     loggedInClassList.remove("hidden")
     document.getElementById("character-menu").classList.remove("hidden")
+    document.getElementById('game-summary').classList.remove("hidden")
   } else {
     loggedInClassList.add("hidden")
     document.getElementById("character-menu").classList.add("hidden")
     document.getElementById("new-character-span").classList.add("hidden")
+    document.getElementById('game-summary').classList.remove("hidden")
   }
 }
 
@@ -182,6 +186,13 @@ function createCharacterDeleteButton(character) {
   return deleteButton
 }
 
+function createPlayButton(character) {
+  const playButton = document.createElement('button')
+  playButton.addEventListener('click', e => {
+
+  })
+}
+
 function processNewCharacter(json) {
   addCharacterToList(json.data)
 }
@@ -194,11 +205,32 @@ function setUpLogOutButton() {
     }).then(resp => {
       setToken.call(resp)
       removeCharactersFromList()
-      switchButtonsAndForms()
+      switchDisplayElements()
     })
   })
 }
 
 function removeCharactersFromList() {
   document.getElementById("character-list").innerHTML = ''
+}
+
+class ActiveCharacter {
+  constructor(character) {
+    this._id = character.id
+    this._name = character.attributes.name
+    this._level = character.attributes.level
+    this._current_hp = character.attributes.current_hp
+    this._armor = character.attributes.armor
+    this._weapon = character.attributes.weapon
+    this._xp = character.attributes.xp
+  }
+
+  get name() {
+    return this._name
+  }
+
+  set name() {
+
+  }
+
 }
