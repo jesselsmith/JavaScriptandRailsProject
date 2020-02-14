@@ -172,12 +172,16 @@ function createCharacterDeleteButton(character) {
   deleteButton.addEventListener('click', e => {
     fetch(`${BASE_URL}/characters/${character.id}`, {
       method: 'DELETE',
-      headers: HEADERS
+      headers: {
+        "Accept": "application/json",
+        "Authorization": currentToken
+      }
     }).then(resp => {
       setToken.call(resp)
       const li = e.target.parentElement
       li.parentElement.removeChild(li)
-    })
+      return resp.json()
+    }).then(json => console.log(json))
   })
   deleteButton.classList.add("delete")
   deleteButton.textContent = 'X'
