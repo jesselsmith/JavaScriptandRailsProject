@@ -1,6 +1,6 @@
 class Monster < ApplicationRecord
 
-  def new_monster_from_api(api_monster)
+  def self.new_monster_from_api(api_monster)
     monster_hash = {}
     monster_hash[type] = api_monster[name]
     monster_hash[name] = "#{Faker::Games::ElderScrolls.first_name} the #{monster_hash[type]}"
