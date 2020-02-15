@@ -1,6 +1,6 @@
 class Monster < ApplicationRecord
 
-  def newMonster_from_api(api_monster)
+  def new_monster_from_api(api_monster)
     monster_hash = {}
     monster_hash[type] = api_monster[name]
     monster_hash[name] = "#{Faker::Games::ElderScrolls.first_name} the #{monster_hash[type]}"
@@ -11,7 +11,6 @@ class Monster < ApplicationRecord
     attack = attack_from_actions(api_monster[actions])
     monster_hash[to_hit_bonus] = attack[attack_bonus]
     monster_hash[damage] = damage_from_attack(attack)
-
     Monster.new(monster_hash)
   end
 
@@ -46,7 +45,7 @@ class Monster < ApplicationRecord
     when 10
       5900
     when 17
-      18000
+      18_000
     else
       0
     end
@@ -54,7 +53,7 @@ class Monster < ApplicationRecord
 
   def attack_from_actions(actions)
     attacks = actions.select  { |action| action.has_key? 'attack_bonus'}
-    attacks.max { |attack_a, attack_b| attack_a[attack_bonus] <=> attack_b[attack_bonus]}
+    attacks.max_by { |attack| [attack[attack_bonus], damage_from_attack(attack)] }
   end
 
   def damage_from_attack(attack)
