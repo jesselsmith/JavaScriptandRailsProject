@@ -6,6 +6,7 @@ class Monster < ApplicationRecord
     monster_hash[name] = "#{Faker::Games::ElderScrolls.first_name} the #{monster_hash[type]}"
     monster_hash[source] = "http://http://www.dnd5eapi.co/api/monsters/#{api_monster[index]}" 
     monster_hash[max_hp] = api_monster[hit_points]
+    monster_hash[current_hp] = monster_hash[max_hp]
     monster_hash[xp_granted] = challenge_rating_to_xp_granted(api_monster[challenge_rating])
     monster_hash[armor_class] = api_monster[armor_class]
     attack = attack_from_actions(api_monster[actions])

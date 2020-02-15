@@ -391,19 +391,24 @@ class ActiveCharacter {
 
 class ActiveMonster {
   constructor(source) {
+    monster_hash = {
+      monster: {
+        'name': '',
+        'type': '',
+        'index': '',
+        'hit_points': '',
+        'challenge_rating': '',
+        'armor_class': '',
+        'actions': []
+      }
+    }
     fetch(source, { method: "GET" }).then(resp => resp.json()).then(json => {
-      this._type = json.name
-      this._name = `${fetch('http://faker.hook.io/?property=name.firstName', { method: "GET" }).then(resp => resp.json()).then(name => name)} the ${this._type}`
-
+      Object.keys(monster_hash.monster).forEach(key => monster_hash.monster[key] = json[key])
     })
+    fetchPoster(BASE_URL + '/monsters', monster_hash, true).then()
   }
 
-  _attackFromActions(actions) {
-    const attacks = actions.filter(action => 'attack_bonus' in action)
-    attacks.sort((attack_a, attack_b) => {
-      attack_b.attack_bonus - attack_a.attack_bonus
-    })
-    this._attackBonus = attacks[0].attack_bonus
-    this._damage = attacks[0].desc
-  }
+
+
 }
+

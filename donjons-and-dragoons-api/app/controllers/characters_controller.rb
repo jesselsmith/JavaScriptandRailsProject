@@ -35,7 +35,6 @@ class CharactersController < ApplicationController
   private
 
   def new_character_params(params)
-    binding.pry
     params.require(:character).permit(:name)
   end
 

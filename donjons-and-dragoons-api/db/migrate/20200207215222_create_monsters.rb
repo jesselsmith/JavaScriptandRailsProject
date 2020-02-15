@@ -9,7 +9,7 @@ class CreateMonsters < ActiveRecord::Migration[6.0]
       t.integer :xp_granted
       t.integer :armor_class
       t.integer :to_hit_bonus
-      t.string :damage
+      t.integer :damage
 
       t.timestamps
     end

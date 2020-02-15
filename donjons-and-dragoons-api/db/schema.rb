@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_011217) do
     t.integer "xp_granted"
     t.integer "armor_class"
     t.integer "to_hit_bonus"
-    t.string "damage"
+    t.integer "damage"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
