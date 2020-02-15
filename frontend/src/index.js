@@ -397,6 +397,15 @@ class ActiveMonster {
 
     })
   }
+
+  _attackFromActions(actions) {
+    const attacks = actions.filter(action => 'attack_bonus' in action)
+    attacks.sort((attack_a, attack_b) => {
+      attack_b.attack_bonus - attack_a.attack_bonus
+    })
+    this._attackBonus = attacks[0].attack_bonus
+    this._damage = attacks[0].desc
+  }
 }
 
 {
@@ -430,39 +439,38 @@ class ActiveMonster {
     "darkvision": "60 ft.",
       "passive_perception": 9
   },
-  "languages": "Common, 
-  Goblin", 
-  "challenge_rating": 0.25,
-    "special_abilities": [{
-      "name": "Nimble Escape",
-      "desc": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
-    }],
-      "actions": [
-        {
-          "name": "Scimitar",
-          "desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) slashing damage.",
-          "attack_bonus": 4,
-          "damage": [{
-            "damage_type": {
-              "name": "Slashing",
-              "url": "/api/damage-types/slashing"
-            },
-            "damage_dice": "1d6",
-            "damage_bonus": 2
-          }]
-        },
-        {
-          "name": "Shortbow",
-          "desc": "Ranged Weapon Attack: +4 to hit, 
+  "languages": "Common, Goblin",
+    "challenge_rating": 0.25,
+      "special_abilities": [{
+        "name": "Nimble Escape",
+        "desc": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
+      }],
+        "actions": [
+          {
+            "name": "Scimitar",
+            "desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) slashing damage.",
+            "attack_bonus": 4,
+            "damage": [{
+              "damage_type": {
+                "name": "Slashing",
+                "url": "/api/damage-types/slashing"
+              },
+              "damage_dice": "1d6",
+              "damage_bonus": 2
+            }]
+          },
+          {
+            "name": "Shortbow",
+            "desc": "Ranged Weapon Attack: +4 to hit, 
 range 80/320 ft., 
 one target.Hit: 5(1d6 + 2) piercing damage.", 
 "attack_bonus": 4,
-        "damage": [{
-          "damage_type": {
-            "name": "Piercing",
-            "url": "/api/damage-types/piercing"
-          },
-          "damage_dice": "1d6",
-          "damage_bonus": 2
-        }] }],
+          "damage": [{
+            "damage_type": {
+              "name": "Piercing",
+              "url": "/api/damage-types/piercing"
+            },
+            "damage_dice": "1d6",
+            "damage_bonus": 2
+          }] }],
 "url": "/api/monsters/goblin" }
