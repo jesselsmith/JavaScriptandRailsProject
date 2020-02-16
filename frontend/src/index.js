@@ -194,12 +194,13 @@ function createPlayButton(character) {
     document.getElementById('gameplay-area').classList.remove('hidden')
     document.getElementById('exploration-buttons').classList.remove('hidden')
     activeCharacter = new ActiveCharacter(character)
+    pcStats = document.getElementById('pc-stats')
+    pcStats.appendChild(`${activeCharacter.name}, Level: ${activeCharacter.level}, HP: ${activeCharacter.currentHp} / ${activeCharacter.maxHp}` +
+      `Attack Bonus: ${activeCharacter.attackBonus}, Damage: ${activeCharacter.damageRange}, Armor Class: ${activeCharacter.armorClass}`)
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
 }
-
-
 
 function processNewCharacter(json) {
   addCharacterToList(json.data)
@@ -275,7 +276,7 @@ class ActiveCharacter {
     this.weapon = this._updateCharacter('weapon', newWeapon)
   }
 
-  gain_xp(xpGained) {
+  gainXp(xpGained) {
     this._xp = this._updateCharacter('xp', this._xp + xpGained)
   }
 
@@ -283,7 +284,7 @@ class ActiveCharacter {
     return Math.floor(Math.random() * dieSize) + 1
   }
 
-  get max_hp() {
+  get maxHp() {
     return this.level * 9 + 4
   }
 
@@ -315,6 +316,31 @@ class ActiveCharacter {
       case 'plate mail':
         return 18
     }
+  }
+
+  get damageRange() {
+    let damageRange = [this.strengthBonus + 1, this.strengthBonus]
+    switch (this._weapon) {
+      case 'shortsword':
+        damageRange[1] += 6
+        break
+      case 'longsword':
+        damageRange[1] += 8
+        break
+      case 'halberd':
+        damageRange[1] += 10
+        break
+      case 'lance':
+        damageRange[1] += 12
+        break
+      case 'greatsword':
+        damageRange[0] += 2
+        damageRange[0] += 12
+        break
+      default:
+        damageRange[1] += 1
+    }
+    return `${damageRange[0]} - ${damageRange[1]}`
   }
 
   get damageRoll() {
@@ -369,6 +395,10 @@ class ActiveCharacter {
     } else {
       addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
     }
+  }
+
+  displayStats() {
+    document.createElement()
   }
 
   _updateCharacter(fieldToUpdate, newValue) {
