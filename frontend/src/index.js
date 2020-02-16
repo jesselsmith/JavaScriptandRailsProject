@@ -233,6 +233,7 @@ class ActiveCharacter {
     this._name = character.attributes.name
     this._level = character.attributes.level
     this._current_hp = character.attributes.current_hp
+    this._max_hp = character.attributes.max_hp
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
@@ -283,11 +284,11 @@ class ActiveCharacter {
   }
 
   get max_hp() {
-    4 + this._level * 9
+    return this.level * 9 + 4
   }
 
   get proficiency() {
-    Math.ceiling(this._level / 4) + 1
+    return Math.ceil(this._level / 4) + 1
   }
 
   get attackBonus() {
@@ -298,7 +299,7 @@ class ActiveCharacter {
   get strengthBonus() {
     if (this._level >= 6) {
       return 5
-    } else if (this.level >= 4) {
+    } else if (this._level >= 4) {
       return 4
     } else {
       return 3
@@ -320,19 +321,19 @@ class ActiveCharacter {
     let damageRoll = this.strengthBonus
     switch (this._weapon) {
       case 'shortsword':
-        damageRoll += rollDie(6)
+        damageRoll += ActiveCharacter.rollDie(6)
         break
       case 'longsword':
-        damageRoll += rollDie(8)
+        damageRoll += ActiveCharacter.rollDie(8)
         break
       case 'halberd':
-        damageRoll += rollDie(10)
+        damageRoll += ActiveCharacter.rollDie(10)
         break
       case 'lance':
-        damageRoll += rollDie(12)
+        damageRoll += ActiveCharacter.rollDie(12)
         break
       case 'greatsword':
-        damageRoll += rollDie(6) + rollDie(6)
+        damageRoll += ActiveCharacter.rollDie(6) + ActiveCharacter.rollDie(6)
         break
       default:
         damageRoll += 1
@@ -341,11 +342,11 @@ class ActiveCharacter {
   }
 
   advantageRoll(advantage) {
-    let rollResult = rollDie(20)
+    let rollResult = ActiveCharacter.rollDie(20)
     if (advantage === 'advantage') {
-      rollResult = Math.max(rollResult, rollDie(20))
+      rollResult = Math.max(rollResult, ActiveCharacter.rollDie(20))
     } else if (advantage === 'disadvantage') {
-      rollResult = Math.min(rollResult, rollDie(20))
+      rollResult = Math.min(rollResult, ActiveCharacter.rollDie(20))
     }
     return rollResult
   }
