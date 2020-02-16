@@ -93,8 +93,6 @@ function processLogin(json) {
   if (json.data) {
     //generate welcome text
     document.getElementById("welcome-text").textContent = `Welcome, ${json.data.attributes.email}!`
-
-
     //show new character button
     setUpNewCharacterButton()
     //prepare list of user's characters
@@ -162,7 +160,6 @@ function addCharacterToList(character) {
   ul = document.getElementById("character-list")
   const li = document.createElement('li')
   li.appendChild(createCharacterDeleteButton(character))
-  li.appendChild(document.createTextNode(`${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`))
   li.appendChild(createPlayButton(character))
   ul.appendChild(li)
 }
@@ -193,7 +190,7 @@ function createPlayButton(character) {
   playButton.addEventListener('click', e => {
 
   })
-  playButton.textContent = `Play as ${character.attributes.name}`
+  playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
 }
 
@@ -456,4 +453,3 @@ class ActiveMonster {
   }
 
 }
-
