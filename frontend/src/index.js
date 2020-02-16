@@ -1,5 +1,6 @@
 const BASE_URL = "http://localhost:3000"
 let currentToken = ""
+let activeCharacter
 const HEADERS = {
   "Content-Type": "application/json",
   "Accept": "application/json",
@@ -188,11 +189,17 @@ function createCharacterDeleteButton(character) {
 function createPlayButton(character) {
   const playButton = document.createElement('button')
   playButton.addEventListener('click', e => {
-
+    document.getElementById('character-menu').classList.add('hidden')
+    document.getElementById('game-summary').classList.add("hidden")
+    document.getElementById('gameplay-area').classList.remove('hidden')
+    document.getElementById('exploration-buttons').classList.remove('hidden')
+    activeCharacter = new ActiveCharacter(character)
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
 }
+
+
 
 function processNewCharacter(json) {
   addCharacterToList(json.data)
