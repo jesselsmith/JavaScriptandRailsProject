@@ -10,7 +10,7 @@ class Monster < ApplicationRecord
     monster_hash[:xp_granted] = challenge_rating_to_xp_granted(api_monster[:challenge_rating])
     monster_hash[:armor_class] = api_monster[:armor_class]
     attack = attack_from_actions(api_monster[:actions])
-    monster_hash[:to_hit_bonus] = attack[:attack_bonus]
+    monster_hash[:attack_bonus] = attack[:attack_bonus]
     monster_hash[:damage] = damage_from_attack(attack)
     Monster.new(monster_hash)
   end
