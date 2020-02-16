@@ -420,7 +420,7 @@ class ActiveMonster {
   }
 
   _update_from_json(json) {
-    this._id = json.id
+    this._id = json.data.id
     const monster = json.data.attributes
     this._name = monster.name
     this._species = monster.species
