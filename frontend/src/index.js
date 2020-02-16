@@ -420,18 +420,40 @@ class ActiveMonster {
   }
 
   _update_from_json(json) {
+    this._id = json.id
     const monster = json.data.attributes
     this._name = monster.name
     this._species = monster.species
     this._source = monster.source
-    this._maxHp = monster.max_hp
-    this._currentHp = monster.current_hp
-    this._xpGranted = monster.xp_granted
-    this._armorClass = monster.armor_class
-    this._attack_bonus = monster.to_hit_bonus
+    this._max_hp = monster.max_hp
+    this._current_hp = monster.current_hp
+    this._xp_granted = monster.xp_granted
+    this._armor_class = monster.armor_class
+    this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
   }
 
+  _updateMonster(fieldToUpdate, newValue) {
+    const monster = { monster: {} }
+    monster['monster'][fieldToUpdate] = newValue
+    fetch(BASE_URL + `/monsters/${this._id}`, {
+      method: "PATCH",
+      headers: HEADERS,
+      body: JSON.stringify(monster)
+    })
+      .then(resp => {
+        setToken.call(resp)
+        resp.json()
+      })
+      .then(json => {
+        if (json.data) {
+          return json.data.attributes[fieldToUpdate]
+        } else {
+          console.log(json)
+          return this['_' + fieldToUpdate]
+        }
+      })
+  }
 
 }
 
