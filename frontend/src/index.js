@@ -390,39 +390,47 @@ class ActiveCharacter {
 }
 
 class ActiveMonster {
-  constructor(source) {
-    monster_hash = {
-      monster: {
-        'name': '',
-        'type': '',
-        'index': '',
-        'hit_points': '',
-        'challenge_rating': '',
-        'armor_class': '',
-        'actions': []
+  constructor(args) {
+    if ('source' in args) {
+      const monster_hash = {
+        monster: {
+          'name': '',
+          'type': '',
+          'index': '',
+          'hit_points': '',
+          'challenge_rating': '',
+          'armor_class': '',
+          'actions': []
+        }
       }
+      fetch(args.source, { method: "GET" }).then(resp => resp.json()).then(json => {
+        Object.keys(monster_hash.monster).forEach(key => monster_hash.monster[key] = json[key])
+      }).then(() => {
+        fetchPoster(BASE_URL + '/monsters', monster_hash, true).then(json => {
+          if (json.data) {
+            this._update_from_json(json)
+          } else {
+            console.log(json)
+          }
+        })
+      })
+    } else if ('json' in args) {
+      this._update_from_json(args.json)
     }
-    fetch(source, { method: "GET" }).then(resp => resp.json()).then(json => {
-      Object.keys(monster_hash.monster).forEach(key => monster_hash.monster[key] = json[key])
-    })
-    fetchPoster(BASE_URL + '/monsters', monster_hash, true).then(json => {
-      if (json.data) {
-        monster = json.data.attributes
-        this._name = monster.name
-        this._type = monster.type
-        this._source = source
-        this._maxHp = monster.max_hp
-        this._currentHp = monster.currentHp
-        this._xpGranted = monster.xp_granted
-        this._armorClass = monster.armor_class
-        this._attack_bonus = monster.to_hit_bonus
-        this._damage = monster.damage
-      } else {
-        console.log(json)
-      }
-    })
   }
 
+  _update_from_json(json) {
+    const monster = json.data.attributes
+    this._name = monster.name
+    this._species = monster.species
+    this._source = monster.source
+    this._maxHp = monster.max_hp
+    this._currentHp = monster.currentHp
+    this._xpGranted = monster.xp_granted
+    this._armorClass = monster.armor_class
+    this._attack_bonus = monster.to_hit_bonus
+    this._damage = monster.damage
+  }
 
 
 }

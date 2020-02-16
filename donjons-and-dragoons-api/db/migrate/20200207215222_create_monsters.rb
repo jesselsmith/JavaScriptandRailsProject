@@ -2,7 +2,7 @@ class CreateMonsters < ActiveRecord::Migration[6.0]
   def change
     create_table :monsters do |t|
       t.string :name
-      t.string :type
+      t.string :species
       t.string :source
       t.integer :max_hp
       t.integer :current_hp

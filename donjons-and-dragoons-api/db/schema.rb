@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_011217) do
 
   create_table "monsters", force: :cascade do |t|
     t.string "name"
-    t.string "type"
+    t.string "species"
     t.string "source"
     t.integer "max_hp"
     t.integer "current_hp"

@@ -2,20 +2,20 @@ class Monster < ApplicationRecord
 
   def self.new_monster_from_api(api_monster)
     monster_hash = {}
-    monster_hash[type] = api_monster[name]
-    monster_hash[name] = "#{Faker::Games::ElderScrolls.first_name} the #{monster_hash[type]}"
-    monster_hash[source] = "http://http://www.dnd5eapi.co/api/monsters/#{api_monster[index]}" 
-    monster_hash[max_hp] = api_monster[hit_points]
-    monster_hash[current_hp] = monster_hash[max_hp]
-    monster_hash[xp_granted] = challenge_rating_to_xp_granted(api_monster[challenge_rating])
-    monster_hash[armor_class] = api_monster[armor_class]
-    attack = attack_from_actions(api_monster[actions])
-    monster_hash[to_hit_bonus] = attack[attack_bonus]
-    monster_hash[damage] = damage_from_attack(attack)
+    monster_hash[:species] = api_monster[:name]
+    monster_hash[:name] = "#{Faker::Games::ElderScrolls.first_name} the #{monster_hash[:species]}"
+    monster_hash[:source] = "http://http://www.dnd5eapi.co/api/monsters/#{api_monster[:index]}" 
+    monster_hash[:max_hp] = api_monster[:hit_points]
+    monster_hash[:current_hp] = monster_hash[:max_hp]
+    monster_hash[:xp_granted] = challenge_rating_to_xp_granted(api_monster[:challenge_rating])
+    monster_hash[:armor_class] = api_monster[:armor_class]
+    attack = attack_from_actions(api_monster[:actions])
+    monster_hash[:to_hit_bonus] = attack[:attack_bonus]
+    monster_hash[:damage] = damage_from_attack(attack)
     Monster.new(monster_hash)
   end
 
-  def challenge_rating_to_xp_granted(cr)
+  def self.challenge_rating_to_xp_granted(cr)
     case cr
     when 0
       10
@@ -52,12 +52,12 @@ class Monster < ApplicationRecord
     end
   end
 
-  def attack_from_actions(actions)
+  def self.attack_from_actions(actions)
     attacks = actions.select  { |action| action.has_key? 'attack_bonus'}
-    attacks.max_by { |attack| [attack[attack_bonus], damage_from_attack(attack)] }
+    attacks.max_by { |attack| [attack[:attack_bonus], damage_from_attack(attack)] }
   end
 
-  def damage_from_attack(attack)
-    attack[desc].split('Hit: ')[1].split(' ').first.to_i
+  def self.damage_from_attack(attack)
+    attack[:desc].split('Hit: ')[1].split(' ').first.to_i
   end
 end
