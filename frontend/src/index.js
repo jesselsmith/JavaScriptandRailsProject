@@ -396,7 +396,7 @@ class ActiveMonster {
         monster: {
           'name': '',
           'type': '',
-          'index': '',
+          'slug': '',
           'hit_points': '',
           'challenge_rating': '',
           'armor_class': '',
@@ -425,7 +425,7 @@ class ActiveMonster {
     this._species = monster.species
     this._source = monster.source
     this._maxHp = monster.max_hp
-    this._currentHp = monster.currentHp
+    this._currentHp = monster.current_hp
     this._xpGranted = monster.xp_granted
     this._armorClass = monster.armor_class
     this._attack_bonus = monster.to_hit_bonus

@@ -13,5 +13,5 @@ end
 private
 
 def create_monster_params(params)
-  params.require(:monster).permit(:name, :type, :index, :hit_points, :challenge_rating, :armor_class, :actions[])
+  params.require(:monster).permit(:name, :type, :slug, :hit_points, :challenge_rating, :armor_class, :actions[])
 end
