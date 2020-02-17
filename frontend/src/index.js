@@ -266,19 +266,26 @@ class ActiveCharacter {
   }
 
   set currentHp(newHp) {
-    this._current_hp = this._updateCharacter('current_hp', newHp)
+    this._current_hp = this._updateCharacter({ 'current_hp': newHp })
   }
 
   set armor(newArmor) {
-    this.armor = this._updateCharacter('armor', newArmor)
+    this.armor = this._updateCharacter({ 'armor': newArmor })
   }
 
   set weapon(newWeapon) {
-    this.weapon = this._updateCharacter('weapon', newWeapon)
+    this.weapon = this._updateCharacter({ 'weapon': newWeapon })
   }
 
   gainXp(xpGained) {
-    this._xp = this._updateCharacter('xp', this._xp + xpGained)
+    updateObject
+    newXp = this._xp + xpGained
+    const xpTable = [300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 14000, 165000, 195000, 225000, 265000, 305000, 355000]
+    if (this._xp >= xpTable[this._level - 1]) {
+      this.levelUp()
+    }
+    this._xp = this._updateCharacter({ 'xp': this._xp + xpGained })
+
   }
 
   static rollDie(dieSize) {
@@ -412,9 +419,10 @@ class ActiveCharacter {
     return `Attack Bonus: +${activeCharacter.attackBonus}, Damage: ${activeCharacter.damageRange}, Armor Class: ${activeCharacter.armorClass}`
   }
 
-  _updateCharacter(fieldToUpdate, newValue) {
-    const character = {}
-    character[fieldToUpdate] = newValue
+  _updateCharacter(objectForUpdating) {
+    const character = {
+      character: objectForUpdating
+    }
     fetch(BASE_URL + `/characters/${this._id}`, {
       method: "PATCH",
       headers: HEADERS,
@@ -426,10 +434,11 @@ class ActiveCharacter {
       })
       .then(json => {
         if (json.data) {
-          return json.data.attributes[fieldToUpdate]
+          Object.keys(objectForUpdating).forEach(field => {
+            this['_' + field] = json.data.attributes[field]
+          })
         } else {
           console.log(json)
-          return this['_' + fieldToUpdate]
         }
       })
   }
