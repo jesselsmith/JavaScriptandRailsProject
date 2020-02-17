@@ -3,7 +3,7 @@ let currentToken = ""
 let activeCharacter
 let activeMonster
 const HEADERS = {
-  "Content-Type": "application/json",
+  "Content-Type": "application/json; charset=UTF-8",
   "Accept": "application/json",
   "Authorization": currentToken
 }
@@ -430,11 +430,7 @@ class ActiveCharacter {
     }
     fetch(BASE_URL + `/characters/${this._id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        "Accept": "application/json",
-        "Authorization": currentToken
-      },
+      headers: HEADERS,
       body: JSON.stringify(character)
     })
       .then(resp => {
@@ -517,10 +513,25 @@ class ActiveMonster {
     return this._max
   }
 
+  get xpGranted() {
+    return this._xp_granted
+  }
+
   get armorClass() {
     return this._armor_class
   }
 
+  get attackBonus() {
+    return this._attack_bonus
+  }
+
+  get damage() {
+    return this._damage
+  }
+
+  set currentHp(newHp) {
+    this._current_hp = this._updateMonster('current_hp', newHp)
+  }
   _updateMonster(fieldToUpdate, newValue) {
     const monster = { monster: {} }
     monster['monster'][fieldToUpdate] = newValue
