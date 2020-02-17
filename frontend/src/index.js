@@ -1,4 +1,5 @@
 const BASE_URL = "http://localhost:3000"
+const EXTERNAL_API_BASE = 'https://api.open5e.com/monsters'
 let currentToken = ""
 let activeCharacter
 let activeMonster
