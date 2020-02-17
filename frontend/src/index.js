@@ -510,7 +510,7 @@ class ActiveMonster {
   }
 
   get maxHp() {
-    return this._max
+    return this._max_hp
   }
 
   get xpGranted() {
