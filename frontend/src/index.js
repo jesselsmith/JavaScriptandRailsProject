@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setUpSignUpAndLogInButtons()
   setUpSignUpAndLoginForms()
   setUpLogOutButton()
+  setUpExplorationButtons()
+  setUpBattleButtons()
 })
 
 function setUpSignUpAndLogInButtons() {
@@ -439,7 +441,7 @@ class ActiveCharacter {
         return resp.json()
       })
       .then(json => {
-        if (json.data) {
+        if (json && json.data) {
           Object.keys(objectForUpdating).forEach(key => {
             this['_' + key] = json.data.attributes[key]
           })
@@ -543,10 +545,10 @@ class ActiveMonster {
     })
       .then(resp => {
         setToken.call(resp)
-        resp.json()
+        return resp.json()
       })
       .then(json => {
-        if (json.data) {
+        if (json && json.data) {
           return json.data.attributes[fieldToUpdate]
         } else {
           console.log(json)
