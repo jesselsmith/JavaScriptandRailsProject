@@ -237,8 +237,7 @@ function setUpExplorationButtons() {
 function setUpFightEvilButton() {
   fightEvil = document.getElementById('fight-evil')
   fightEvil.addEventListener('click', e => {
-    const monsterStats = document.getElementById('monster-stats')
-    monsterStats.appendChild(activeCharacter.fightEvil())
+    activeCharacter.fightEvil()
     document.getElementById('exploration-buttons').classList.add('hidden')
     document.getElementById('battle-buttons').classList.remove('hidden')
   })
@@ -490,31 +489,37 @@ class ActiveCharacter {
     return `Attack Bonus: +${this.attackBonus}, Damage: ${this.damageRange}, Armor Class: ${this.armorClass}`
   }
 
+  createMonsterFromResult = (monsterList, monsterSelection) => {
+    new ActiveMonster({
+      source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}`, callback: newMonster => {
+        activeMonster = newMonster
+        addGameEvent(`You have encountered ${activeMonster.name}!`)
+        const monsterStats = document.getElementById('monster-stats')
+        monsterStats.appendChild(activeMonster.displayStats())
+      }
+    })
+  }
+  createMonsterFromList = (monsterList) => {
+    let monsterSelection = ActiveCharacter.rollDie(parseInt(monsterList.count)) - 1
+    if (monsterSelection > 50) {
+      const page = Math.ceil(monsterSelection + 1 / 50)
+      monsterSelection = monsterSelection % 50
+      monsterList = this.fetchMonsterList(`${crToFight}&page=${page}`).then(json => {
+        this.createMonsterFromResult(json, monsterSelection)
+      })
+    } else {
+      this.createMonsterFromResult(monsterList, monsterSelection)
+    }
+  }
+
   fightEvil() {
     const difficulty = Math.floor(Math.random() * 4)
     // 25% chance of easy battle, 50% chance of medium battle, 25% chance of hard battle
     const crToFight = this.appropriate_crs_to_fight[Math.ceil(difficulty / 2)]
-    return this.fetchMonsterList(crToFight).then(this._createMonsterFromAppropriateCrList)
+    this.fetchMonsterList(crToFight).then(this.createMonsterFromList)
   }
 
-  _createMonsterFromAppropriateCrList(json) {
-    let monsterSelection = ActiveCharacter.rollDie(parseInt(json.count)) = 1
-    if (monsterSelection > 50) {
-      const page = Math.ceil(monsterSelection + 1 / 50)
-      monsterSelection = monsterSelection % 50
-      this.fetchMonsterList(`${crToFight}&page=${page}`).then(newPageJson => {
-        return this._createMonsterFromResults(newPageJson, monsterSelection)
-      })
-    } else {
-      return this._createMonsterFromResults(json, monsterSelection)
-    }
-  }
 
-  _createMonsterFromResults(monsterList, monsterSelection) {
-    activeMonster = new ActiveMonster({ source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}` })
-    addGameEvent(`You have encountered ${activeMonster.name}!`)
-    return activeMonster.displayStats()
-  }
 
   async fetchMonsterList(crAndOrPageNumber) {
     const resp = await fetch(EXTERNAL_API_BASE + `/?challenge_rating=${crAndOrPageNumber}`)
@@ -570,6 +575,9 @@ class ActiveMonster {
         fetchPoster(BASE_URL + '/monsters', monster_hash, true).then(json => {
           if (json.data) {
             this._update_from_json(json)
+            if ('callback' in args) {
+              callback(this)
+            }
           } else {
             console.log(json)
           }
