@@ -38,9 +38,11 @@ body {
   }
   
   p {
-    font-size: 1.5em;
+    font-size: 1em;
     color: black;
     font-family: Helvetica;
+    margin: 1px;
+    padding: 1px;
   }
   
   li {
@@ -109,4 +111,5 @@ body {
 
   #game-event-display{
     overflow: auto;
+    max-height: 70vmax
   }

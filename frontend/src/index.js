@@ -226,7 +226,9 @@ function removeCharactersFromList() {
 
 function addGameEvent(text) {
   gameEventDisplay = document.getElementById('game-event-display')
-  gameEventDisplay.textContent = text + gameEventDisplay.textContent
+  newEvent = document.createElement('p')
+  newEvent.textContent = text
+  gameEventDisplay.insertBefore(newEvent, gameEventDisplay.firstChild)
 }
 
 class ActiveCharacter {
@@ -239,6 +241,7 @@ class ActiveCharacter {
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
+    this._appropriate_crs_to_fight = character.attributes._appropriate_crs_to_fight
   }
 
   get name() {
@@ -278,12 +281,14 @@ class ActiveCharacter {
   }
 
   gainXp(xpGained) {
-    updateObject = { 'xp': this._xp + xpGained }
+    const updateObject = { 'xp': this._xp + xpGained }
     const xpTable = [300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 14000, 165000, 195000, 225000, 265000, 305000, 355000]
-    newLevel = xpTable.findIndex(element => element > updateObject.xp) + 1
+    const newLevel = xpTable.findIndex(element => element > updateObject.xp) + 1
+    addGameEvent(`${this._name} gained ${xpGained} experience points.`)
     if (newLevel !== this._level) {
       updateObject['level'] = newLevel
       updateObject['current_hp'] = this._current_hp + 9 * (newLevel - this._level)
+      addGameEvent(`${this._name} is now level ${newLevel}!`)
     }
     this._updateCharacter(updateObject)
   }
