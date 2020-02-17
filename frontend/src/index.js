@@ -195,12 +195,13 @@ function createPlayButton(character) {
     document.getElementById('exploration-buttons').classList.remove('hidden')
     activeCharacter = new ActiveCharacter(character)
     pcStats = document.getElementById('pc-stats')
-    pcStats.appendChild(`${activeCharacter.name}, Level: ${activeCharacter.level}, HP: ${activeCharacter.currentHp} / ${activeCharacter.maxHp}` +
-      `Attack Bonus: ${activeCharacter.attackBonus}, Damage: ${activeCharacter.damageRange}, Armor Class: ${activeCharacter.armorClass}`)
+    pcStats.appendChild(activeCharacter.displayStats())
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
 }
+
+
 
 function processNewCharacter(json) {
   addCharacterToList(json.data)
@@ -398,7 +399,17 @@ class ActiveCharacter {
   }
 
   displayStats() {
-    document.createElement()
+    let statDisplay = document.getElementById(`${this.name}-stats`)
+    if (!statDisplay) {
+      statDisplay = document.createElement('div')
+      statDisplay.setAttribute('id', `${this.name}-stats`)
+    }
+    statDisplay.textContent = `${activeCharacter.name}, Level: ${activeCharacter.level}, HP: ${activeCharacter.currentHp} / ${activeCharacter.maxHp}`
+    return statDisplay
+  }
+
+  displayDetailedStats() {
+    return `Attack Bonus: +${activeCharacter.attackBonus}, Damage: ${activeCharacter.damageRange}, Armor Class: ${activeCharacter.armorClass}`
   }
 
   _updateCharacter(fieldToUpdate, newValue) {

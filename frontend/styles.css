@@ -20,10 +20,10 @@ body {
   }
   
   main {
-    display: grid;
+    /* display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    grid-gap: 20px;
+    grid-gap: 20px; */
     padding-top: 10px;
     padding-bottom: 30px;
   }
@@ -108,5 +108,5 @@ body {
   }
 
   #game-event-display{
-    overflow: scroll;
+    overflow: auto;
   }
