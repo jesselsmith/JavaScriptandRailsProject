@@ -646,7 +646,7 @@ class ActiveMonster {
       statDisplay = document.createElement('div')
       statDisplay.setAttribute('id', `${this.name}-stats`)
     }
-    statDisplay.textContent = `${this.name}, Level: ${this.level}, HP: ${this.currentHp} / ${this.maxHp}`
+    statDisplay.textContent = `${this.name}, HP: ${Math.round(this.currentHp / this.maxHp * 100)}%`
     return statDisplay
   }
   _updateMonster(fieldToUpdate, newValue) {

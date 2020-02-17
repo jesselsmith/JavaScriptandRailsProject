@@ -57,6 +57,10 @@ body {
     float: right;
     padding: 10px;
   }
+
+  main span {
+    display: inline-block;
+  }
   
   button {
     font-size: 1em;
