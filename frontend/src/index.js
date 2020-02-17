@@ -266,26 +266,26 @@ class ActiveCharacter {
   }
 
   set currentHp(newHp) {
-    this._current_hp = this._updateCharacter({ 'current_hp': newHp })
+    this._updateCharacter({ 'current_hp': newHp })
   }
 
   set armor(newArmor) {
-    this.armor = this._updateCharacter({ 'armor': newArmor })
+    this._updateCharacter({ 'armor': newArmor })
   }
 
   set weapon(newWeapon) {
-    this.weapon = this._updateCharacter({ 'weapon': newWeapon })
+    this._updateCharacter({ 'weapon': newWeapon })
   }
 
   gainXp(xpGained) {
-    updateObject
-    newXp = this._xp + xpGained
+    updateObject = { 'xp': this._xp + xpGained }
     const xpTable = [300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 14000, 165000, 195000, 225000, 265000, 305000, 355000]
-    if (this._xp >= xpTable[this._level - 1]) {
-      this.levelUp()
+    newLevel = xpTable.findIndex(element => element > updateObject.xp) + 1
+    if (newLevel !== this._level) {
+      updateObject['level'] = newLevel
+      updateObject['current_hp'] = this._current_hp + 9 * (newLevel - this._level)
     }
-    this._xp = this._updateCharacter({ 'xp': this._xp + xpGained })
-
+    this._updateCharacter(updateObject)
   }
 
   static rollDie(dieSize) {
@@ -425,18 +425,23 @@ class ActiveCharacter {
     }
     fetch(BASE_URL + `/characters/${this._id}`, {
       method: "PATCH",
-      headers: HEADERS,
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        "Accept": "application/json",
+        "Authorization": currentToken
+      },
       body: JSON.stringify(character)
     })
       .then(resp => {
         setToken.call(resp)
-        resp.json()
+        return resp.json()
       })
       .then(json => {
         if (json.data) {
           Object.keys(objectForUpdating).forEach(field => {
             this['_' + field] = json.data.attributes[field]
           })
+          this.displayStats()
         } else {
           console.log(json)
         }
@@ -480,7 +485,6 @@ class ActiveMonster {
     this._name = monster.name
     this._species = monster.species
     this._source = monster.source
-    this._max_hp = monster.max_hp
     this._current_hp = monster.current_hp
     this._xp_granted = monster.xp_granted
     this._armor_class = monster.armor_class
