@@ -198,7 +198,7 @@ function createPlayButton(character) {
     document.getElementById('gameplay-area').classList.remove('hidden')
     document.getElementById('exploration-buttons').classList.remove('hidden')
     activeCharacter = new ActiveCharacter(character)
-    pcStats = document.getElementById('pc-stats')
+    const pcStats = document.getElementById('pc-stats')
     pcStats.appendChild(activeCharacter.displayStats())
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
@@ -235,7 +235,13 @@ function setUpExplorationButtons() {
 }
 
 function setUpFightEvilButton() {
-
+  fightEvil = document.getElementById('fight-evil')
+  fightEvil.addEventListener('click', e => {
+    const monsterStats = document.getElementById('monster-stats')
+    monsterStats.appendChild(activeCharacter.fightEvil())
+    document.getElementById('exploration-buttons').classList.add('hidden')
+    document.getElementById('battle-buttons').classList.remove('hidden')
+  })
 }
 
 function setUpShortRestButton() {
@@ -279,7 +285,7 @@ class ActiveCharacter {
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
-    this._appropriate_crs_to_fight = character.attributes._appropriate_crs_to_fight
+    this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
   }
 
   get name() {
@@ -418,6 +424,10 @@ class ActiveCharacter {
     return damageRoll
   }
 
+  get appropriate_crs_to_fight() {
+    return this._appropriate_crs_to_fight
+  }
+
   advantageRoll(advantage) {
     let rollResult = ActiveCharacter.rollDie(20)
     if (advantage === 'advantage') {
@@ -472,12 +482,43 @@ class ActiveCharacter {
       statDisplay = document.createElement('div')
       statDisplay.setAttribute('id', `${this.name}-stats`)
     }
-    statDisplay.textContent = `${activeCharacter.name}, Level: ${activeCharacter.level}, HP: ${activeCharacter.currentHp} / ${activeCharacter.maxHp}`
+    statDisplay.textContent = `${this.name}, Level: ${this.level}, HP: ${this.currentHp} / ${this.maxHp}`
     return statDisplay
   }
 
   displayDetailedStats() {
-    return `Attack Bonus: +${activeCharacter.attackBonus}, Damage: ${activeCharacter.damageRange}, Armor Class: ${activeCharacter.armorClass}`
+    return `Attack Bonus: +${this.attackBonus}, Damage: ${this.damageRange}, Armor Class: ${this.armorClass}`
+  }
+
+  fightEvil() {
+    const difficulty = Math.floor(Math.random() * 4)
+    // 25% chance of easy battle, 50% chance of medium battle, 25% chance of hard battle
+    const crToFight = this.appropriate_crs_to_fight[Math.ceil(difficulty / 2)]
+    return this.fetchMonsterList(crToFight).then(this._createMonsterFromAppropriateCrList)
+  }
+
+  _createMonsterFromAppropriateCrList(json) {
+    let monsterSelection = ActiveCharacter.rollDie(parseInt(json.count)) = 1
+    if (monsterSelection > 50) {
+      const page = Math.ceil(monsterSelection + 1 / 50)
+      monsterSelection = monsterSelection % 50
+      this.fetchMonsterList(`${crToFight}&page=${page}`).then(newPageJson => {
+        return this._createMonsterFromResults(newPageJson, monsterSelection)
+      })
+    } else {
+      return this._createMonsterFromResults(json, monsterSelection)
+    }
+  }
+
+  _createMonsterFromResults(monsterList, monsterSelection) {
+    activeMonster = new ActiveMonster({ source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}` })
+    addGameEvent(`You have encountered ${activeMonster.name}!`)
+    return activeMonster.displayStats()
+  }
+
+  async fetchMonsterList(crAndOrPageNumber) {
+    const resp = await fetch(EXTERNAL_API_BASE + `/?challenge_rating=${crAndOrPageNumber}`)
+    return await resp.json()
   }
 
   _updateCharacter(objectForUpdating) {
@@ -587,6 +628,16 @@ class ActiveMonster {
 
   set currentHp(newHp) {
     this._current_hp = this._updateMonster('current_hp', newHp)
+  }
+
+  displayStats() {
+    let statDisplay = document.getElementById(`${this.name}-stats`)
+    if (!statDisplay) {
+      statDisplay = document.createElement('div')
+      statDisplay.setAttribute('id', `${this.name}-stats`)
+    }
+    statDisplay.textContent = `${this.name}, Level: ${this.level}, HP: ${this.currentHp} / ${this.maxHp}`
+    return statDisplay
   }
   _updateMonster(fieldToUpdate, newValue) {
     const monster = { monster: {} }
