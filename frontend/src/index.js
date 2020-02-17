@@ -1,6 +1,7 @@
 const BASE_URL = "http://localhost:3000"
 let currentToken = ""
 let activeCharacter
+let activeMonster
 const HEADERS = {
   "Content-Type": "application/json",
   "Accept": "application/json",
@@ -237,7 +238,6 @@ class ActiveCharacter {
     this._name = character.attributes.name
     this._level = character.attributes.level
     this._current_hp = character.attributes.current_hp
-    this._max_hp = character.attributes.max_hp
     this._armor = character.attributes.armor
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
@@ -443,9 +443,12 @@ class ActiveCharacter {
       })
       .then(json => {
         if (json.data) {
-          Object.keys(objectForUpdating).forEach(field => {
-            this['_' + field] = json.data.attributes[field]
+          Object.keys(objectForUpdating).forEach(key => {
+            this['_' + key] = json.data.attributes[key]
           })
+          if ('level' in objectForUpdating) {
+            this._appropriate_crs_to_fight = json.data.attributes.appropriate_crs_to_fight
+          }
           this.displayStats()
         } else {
           console.log(json)
@@ -491,10 +494,31 @@ class ActiveMonster {
     this._species = monster.species
     this._source = monster.source
     this._current_hp = monster.current_hp
+    this._max_hp = monster.max_hp
     this._xp_granted = monster.xp_granted
     this._armor_class = monster.armor_class
     this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
+  }
+
+  get name() {
+    return this._name
+  }
+
+  get species() {
+    return this._species
+  }
+
+  get currentHp() {
+    return this._current_hp
+  }
+
+  get maxHp() {
+    return this._max
+  }
+
+  get armorClass() {
+    return this._armor_class
   }
 
   _updateMonster(fieldToUpdate, newValue) {
