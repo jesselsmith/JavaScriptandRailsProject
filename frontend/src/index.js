@@ -228,6 +228,41 @@ function removeCharactersFromList() {
   document.getElementById("character-list").innerHTML = ''
 }
 
+function setUpExplorationButtons() {
+  setUpFightEvilButton()
+  setUpShortRestButton()
+  setUpLongRestButton()
+}
+
+function setUpFightEvilButton() {
+
+}
+
+function setUpShortRestButton() {
+
+}
+function setUpLongRestButton() {
+
+}
+
+function setUpBattleButtons() {
+  setUpAttackButton()
+  setUpFleeButton()
+  setUpSecondWindButton()
+}
+
+function setUpAttackButton() {
+
+}
+
+function setUpFleeButton() {
+
+}
+
+function setUpSecondWindButton() {
+
+}
+
 function addGameEvent(text) {
   gameEventDisplay = document.getElementById('game-event-display')
   newEvent = document.createElement('p')
@@ -350,8 +385,8 @@ class ActiveCharacter {
         damageRange[1] += 12
         break
       case 'greatsword':
-        damageRange[0] += 2
-        damageRange[0] += 12
+        damageRange[0] += 1
+        damageRange[1] += 12
         break
       default:
         damageRange[1] += 1
@@ -410,6 +445,24 @@ class ActiveCharacter {
       addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
+    }
+  }
+
+  extraAttack(monster, advantage = 'straight') {
+    for (let i = 0; i < this.numAttacks; i++) {
+      this.attack(monster, advantage)
+    }
+  }
+
+  get numAttacks() {
+    if (this._level === 20) {
+      return 4
+    } else if (this._level >= 11) {
+      return 3
+    } else if (this._level >= 5) {
+      return 2
+    } else {
+      return 1
     }
   }
 
