@@ -10,7 +10,7 @@ class Monster < ApplicationRecord
     monster_hash[:xp_granted] = challenge_rating_to_xp_granted(api_monster[:challenge_rating])
     monster_hash[:armor_class] = api_monster[:armor_class]
     attack = attack_from_actions(api_monster[:actions])
-    monster_hash[:attack_bonus] = attack[:attack_bonus]
+    monster_hash[:attack_bonus] = attack[:attack_bonus] || 0
     monster_hash[:damage] = damage_from_attack(attack)
     Monster.new(monster_hash)
   end
@@ -92,7 +92,7 @@ class Monster < ApplicationRecord
 
   def self.attack_from_actions(actions)
     attacks = actions.select  { |action| action.has_key? 'attack_bonus'}
-    attacks.max_by { |attack| [attack[:attack_bonus], damage_from_attack(attack)] }
+    attacks.max_by { |attack| [attack[:attack_bonus], damage_from_attack(attack)] } || {attack_bonus: 0, desc: 'Hit: 0'}
   end
 
   def self.damage_from_attack(attack)

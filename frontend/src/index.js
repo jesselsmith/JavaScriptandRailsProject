@@ -240,6 +240,7 @@ function setUpFightEvilButton() {
     activeCharacter.fightEvil()
     document.getElementById('exploration-buttons').classList.add('hidden')
     document.getElementById('battle-buttons').classList.remove('hidden')
+    document.getElementById('monster-stats').classList.remove('hidden')
   })
 }
 
@@ -491,7 +492,8 @@ class ActiveCharacter {
 
   createMonsterFromResult = (monsterList, monsterSelection) => {
     new ActiveMonster({
-      source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}`, callback: newMonster => {
+      source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}`,
+      callback: newMonster => {
         activeMonster = newMonster
         addGameEvent(`You have encountered ${activeMonster.name}!`)
         const monsterStats = document.getElementById('monster-stats')
@@ -576,7 +578,7 @@ class ActiveMonster {
           if (json.data) {
             this._update_from_json(json)
             if ('callback' in args) {
-              callback(this)
+              args.callback(this)
             }
           } else {
             console.log(json)
