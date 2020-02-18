@@ -279,6 +279,20 @@ function addGameEvent(text) {
   gameEventDisplay.insertBefore(newEvent, gameEventDisplay.firstChild)
 }
 
+function rollDie(dieSize) {
+  return Math.floor(Math.random() * dieSize) + 1
+}
+
+function advantageRoll(advantage) {
+  let rollResult = rollDie(20)
+  if (advantage === 'advantage') {
+    rollResult = Math.max(rollResult, rollDie(20))
+  } else if (advantage === 'disadvantage') {
+    rollResult = Math.min(rollResult, rollDie(20))
+  }
+  return rollResult
+}
+
 class ActiveCharacter {
   constructor(character) {
     this._id = character.id
@@ -289,6 +303,7 @@ class ActiveCharacter {
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
+    this._gold = character.attributes.gold
   }
 
   get name() {
@@ -315,6 +330,9 @@ class ActiveCharacter {
     return this._xp
   }
 
+  get gold() {
+    return this._gold
+  }
   set currentHp(newHp) {
     this._updateCharacter({ 'current_hp': newHp })
   }
@@ -325,6 +343,10 @@ class ActiveCharacter {
 
   set weapon(newWeapon) {
     this._updateCharacter({ 'weapon': newWeapon })
+  }
+
+  set gold(newGoldAmount) {
+    this._updateCharacter({ 'gold': newGoldAmount })
   }
 
   gainXp(xpGained) {
@@ -338,10 +360,6 @@ class ActiveCharacter {
       addGameEvent(`${this._name} is now level ${newLevel}!`)
     }
     this._updateCharacter(updateObject)
-  }
-
-  static rollDie(dieSize) {
-    return Math.floor(Math.random() * dieSize) + 1
   }
 
   get maxHp() {
@@ -407,19 +425,19 @@ class ActiveCharacter {
     let damageRoll = this.strengthBonus
     switch (this._weapon) {
       case 'shortsword':
-        damageRoll += ActiveCharacter.rollDie(6)
+        damageRoll += rollDie(6)
         break
       case 'longsword':
-        damageRoll += ActiveCharacter.rollDie(8)
+        damageRoll += rollDie(8)
         break
       case 'halberd':
-        damageRoll += ActiveCharacter.rollDie(10)
+        damageRoll += rollDie(10)
         break
       case 'lance':
-        damageRoll += ActiveCharacter.rollDie(12)
+        damageRoll += rollDie(12)
         break
       case 'greatsword':
-        damageRoll += ActiveCharacter.rollDie(6) + ActiveCharacter.rollDie(6)
+        damageRoll += rollDie(6) + rollDie(6)
         break
       default:
         damageRoll += 1
@@ -431,18 +449,8 @@ class ActiveCharacter {
     return this._appropriate_crs_to_fight
   }
 
-  advantageRoll(advantage) {
-    let rollResult = ActiveCharacter.rollDie(20)
-    if (advantage === 'advantage') {
-      rollResult = Math.max(rollResult, ActiveCharacter.rollDie(20))
-    } else if (advantage === 'disadvantage') {
-      rollResult = Math.min(rollResult, ActiveCharacter.rollDie(20))
-    }
-    return rollResult
-  }
-
   attack(monster, advantage = 'straight') {
-    const dieRoll = this.advantageRoll(advantage)
+    const dieRoll = advantageRoll(advantage)
     const attackRoll = this.attackBonus + dieRoll
     if (dieRoll === 20) {
       const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
@@ -509,7 +517,7 @@ class ActiveCharacter {
     })
   }
   createMonsterFromList = (monsterList) => {
-    let monsterSelection = ActiveCharacter.rollDie(parseInt(monsterList.count)) - 1
+    let monsterSelection = rollDie(parseInt(monsterList.count)) - 1
     if (monsterSelection > 50) {
       const page = Math.ceil(monsterSelection + 1 / 50)
       monsterSelection = monsterSelection % 50
@@ -607,6 +615,7 @@ class ActiveMonster {
     this._armor_class = monster.armor_class
     this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
+    this._treasure = monster.treasure
   }
 
   get name() {
@@ -641,6 +650,10 @@ class ActiveMonster {
     return this._damage
   }
 
+  get treasure() {
+    return this._treasure
+  }
+
   set currentHp(newHp) {
     this._current_hp = this._updateMonster('current_hp', newHp)
     if (this._current_hp <= 0) {
@@ -660,19 +673,17 @@ class ActiveMonster {
   }
 
   attack(character, advantage = 'straight') {
-    const dieRoll = this.advantageRoll(advantage)
+    const dieRoll = advantageRoll(advantage)
     const attackRoll = this.attackBonus + dieRoll
     if (dieRoll === 20) {
-      const critDamage = this.damage + this.damage
-      character.currentHp = character.currentHp - critDamage
-      addGameEvent(`${this._name} critically hit ${character.name} for ${damage} damage!!`)
+      character.currentHp = character.currentHp - (2 * this.damage)
+      addGameEvent(`${this._name} critically hit ${character.name} for ${2 * this.damage} damage!!`)
     }
     else if (dieRoll === 1) {
       addGameEvent(`${this._name}'s attack critically missed ${character.name}!`)
     }
     else if (attackRoll >= character.armorClass) {
-      const damage = this.damageRoll
-      character.currentHp = character.currentHp - damage
+      character.currentHp = character.currentHp - this.damage
       addGameEvent(`${this._name} hit ${character.name} for ${damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${character.name}.`)

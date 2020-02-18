@@ -9,6 +9,7 @@ class CharactersController < ApplicationController
     character.weapon = "longsword"
     character.current_hp = character.max_hp
     character.xp = 0
+    character.gold = 10
     if character.save
       render json: CharacterSerializer.new(character)
     else
