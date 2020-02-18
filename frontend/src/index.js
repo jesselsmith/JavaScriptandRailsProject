@@ -260,7 +260,7 @@ function setUpBattleButtons() {
 function setUpAttackButton() {
   attackButton = document.getElementById('attack')
   attackButton.addEventListener('click', e => {
-    activeCharacter.extraAttack(activeMonster)
+    activeCharacter.attack(activeMonster)
   })
 }
 
@@ -450,30 +450,26 @@ class ActiveCharacter {
   }
 
   attack(monster, advantage = 'straight') {
-    const dieRoll = advantageRoll(advantage)
-    const attackRoll = this.attackBonus + dieRoll
-    if (dieRoll === 20) {
-      const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
-      monster.currentHp = monster.currentHp - critDamage
-      addGameEvent(`${this._name} critically hit ${monster.name} with their ${this._weapon} for ${damage} damage!!`)
-    }
-    else if (dieRoll === 1) {
-      addGameEvent(`${this._name}'s attack critically missed ${monster.name}!`)
-    }
-    else if (attackRoll >= monster.armorClass) {
-      const damage = this.damageRoll
-      monster.currentHp = monster.currentHp - damage
-      addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
-    } else {
-      addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
+    for (let i = 0; i < this.numAttacks; i++) {
+      const dieRoll = advantageRoll(advantage)
+      const attackRoll = this.attackBonus + dieRoll
+      if (dieRoll === 20) {
+        const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
+        monster.currentHp = monster.currentHp - critDamage
+        addGameEvent(`${this._name} critically hit ${monster.name} with their ${this._weapon} for ${damage} damage!!`)
+      }
+      else if (dieRoll === 1) {
+        addGameEvent(`${this._name}'s attack critically missed ${monster.name}!`)
+      }
+      else if (attackRoll >= monster.armorClass) {
+        const damage = this.damageRoll
+        monster.currentHp = monster.currentHp - damage
+        addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
+      } else {
+        addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
+      }
     }
     monster.displayStats()
-  }
-
-  extraAttack(monster, advantage = 'straight') {
-    for (let i = 0; i < this.numAttacks; i++) {
-      this.attack(monster, advantage)
-    }
     if (monster.currentHp > 0) {
       monster.attack(this)
     }
@@ -513,6 +509,10 @@ class ActiveCharacter {
         addGameEvent(`You have encountered ${activeMonster.name}!`)
         const monsterStats = document.getElementById('monster-stats')
         monsterStats.appendChild(activeMonster.displayStats())
+        if (rollDie(2) - 1) {
+          addGameEvent(`${activeMonster.name} got the jump on ${activeCharacter.name}!`)
+          activeMonster.attack(activeCharacter)
+        }
       }
     })
   }
