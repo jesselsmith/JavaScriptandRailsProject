@@ -1,11 +1,17 @@
 class MonstersController < ApplicationController
   respond_to :json
   def create
-    monster = Monster.new_monster_from_api(create_monster_params(params))
-    if monster.save
-      render json: MonsterSerializer.new(monster)
+    character = Character.find_by(id: params[:character_id])
+    if character
+      monster = Monster.new_monster_from_api(create_monster_params(params))
+      if monster.valid?
+        character.monster = monster
+        render json: MonsterSerializer.new(monster)
+      else
+        render json: { message: "Invalid Monster" }
+      end
     else
-      render json: { message: "Invalid Monster" }
+      render json: {message: "Could not find that character."}
     end
   end
 

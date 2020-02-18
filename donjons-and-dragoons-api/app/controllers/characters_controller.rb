@@ -4,12 +4,6 @@ class CharactersController < ApplicationController
   before_action :authenticate_user!
   def create
     character = current_user.characters.build(new_character_params(params))
-    character.level = 1
-    character.armor = "chain mail"
-    character.weapon = "longsword"
-    character.current_hp = character.max_hp
-    character.xp = 0
-    character.gold = 10
     if character.save
       render json: CharacterSerializer.new(character)
     else

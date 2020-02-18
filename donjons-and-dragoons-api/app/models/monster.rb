@@ -1,4 +1,7 @@
 class Monster < ApplicationRecord
+  
+  belongs_to :character
+  validates :name, uniqueness: true
 
   def self.new_monster_from_api(api_monster)
     monster_hash = {}

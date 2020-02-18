@@ -14,12 +14,12 @@ ActiveRecord::Schema.define(version: 2020_02_13_011217) do
 
   create_table "characters", force: :cascade do |t|
     t.string "name"
-    t.integer "level"
-    t.integer "current_hp"
-    t.string "armor"
-    t.string "weapon"
-    t.integer "xp"
-    t.decimal "gold", precision: 15, scale: 2
+    t.integer "level", default: 1
+    t.integer "current_hp", default: 13
+    t.string "armor", default: "chain mail"
+    t.string "weapon", default: "longsword"
+    t.integer "xp", default: 0
+    t.decimal "gold", precision: 15, scale: 2, default: "10.0"
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -43,8 +43,10 @@ ActiveRecord::Schema.define(version: 2020_02_13_011217) do
     t.integer "attack_bonus"
     t.integer "damage"
     t.decimal "gold"
+    t.integer "character_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["character_id"], name: "index_monsters_on_character_id"
   end
 
   create_table "users", force: :cascade do |t|

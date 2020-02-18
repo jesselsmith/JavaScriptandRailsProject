@@ -11,6 +11,7 @@ class CreateMonsters < ActiveRecord::Migration[6.0]
       t.integer :attack_bonus
       t.integer :damage
       t.decimal :gold
+      t.belongs_to :character
 
       t.timestamps
     end

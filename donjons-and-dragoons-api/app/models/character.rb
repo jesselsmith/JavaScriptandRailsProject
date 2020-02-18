@@ -1,5 +1,6 @@
 class Character < ApplicationRecord
   belongs_to :user
+  has_one :monster, dependent: :destroy
 
   def max_hp()
     self.level * 9 + 4 if self.level
