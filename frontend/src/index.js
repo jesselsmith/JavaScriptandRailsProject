@@ -657,11 +657,15 @@ class ActiveMonster {
   }
 
   set currentHp(newHp) {
-    this._current_hp = this._updateMonster('current_hp', newHp)
-    if (this._current_hp <= 0) {
-      addGameEvent(`${this._name} has been defeated!`)
-      activeCharacter.gainXp(this._xp_granted)
-    }
+    this._updateMonster({
+      update: { 'current_hp': newHp },
+      callback: () => {
+        if (this._current_hp <= 0) {
+          addGameEvent(`${this._name} has been defeated!`)
+          activeCharacter.gainXp(this._xp_granted)
+        }
+      }
+    })
   }
 
   displayStats() {
@@ -692,9 +696,8 @@ class ActiveMonster {
     }
     character.displayStats()
   }
-  _updateMonster(fieldToUpdate, newValue) {
-    const monster = { monster: {} }
-    monster['monster'][fieldToUpdate] = newValue
+  _updateMonster(updateObject) {
+    const monster = { monster: updateObject.update }
     fetch(BASE_URL + `/monsters/${this._id}`, {
       method: "PATCH",
       headers: HEADERS,
@@ -702,13 +705,16 @@ class ActiveMonster {
     })
       .then(resp => {
         setToken.call(resp)
-        debugger
         return resp.json()
       })
       .then(json => {
         if (json && json.data) {
-          debugger
-          return json.data.attributes[fieldToUpdate]
+          Object.keys(updateObject).forEach(key => {
+            this['_' + key] = json.data.attributes[key]
+          })
+          if ('callback' in updateObject) {
+            updateObject.callback()
+          }
         } else {
           console.log(json)
           return this['_' + fieldToUpdate]

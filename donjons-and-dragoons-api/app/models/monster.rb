@@ -12,7 +12,7 @@ class Monster < ApplicationRecord
     attack = attack_from_actions(api_monster[:actions])
     monster_hash[:attack_bonus] = attack[:attack_bonus] || 0
     monster_hash[:damage] = damage_from_attack(attack)
-    monster_hash[:gold] = this.treasure()
+    monster_hash[:gold] = Monster.treasure(monster_hash[:xp_granted])
     Monster.new(monster_hash)
   end
 
@@ -100,7 +100,7 @@ class Monster < ApplicationRecord
     attack[:desc].split('Hit: ')[1].split(' ').first.to_i
   end
 
-  def treasure()
+  def self.treasure(xp_granted)
     treasure_array = [
       {
         xp_cutoff: 1100,
