@@ -456,7 +456,7 @@ class ActiveCharacter {
       if (dieRoll === 20) {
         const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
         monster.currentHp = monster.currentHp - critDamage
-        addGameEvent(`${this._name} critically hit ${monster.name} with their ${this._weapon} for ${damage} damage!!`)
+        addGameEvent(`${this._name} critically hit ${monster.name} with a ${this._weapon} for ${damage} damage!!`)
       }
       else if (dieRoll === 1) {
         addGameEvent(`${this._name}'s attack critically missed ${monster.name}!`)
@@ -464,7 +464,7 @@ class ActiveCharacter {
       else if (attackRoll >= monster.armorClass) {
         const damage = this.damageRoll
         monster.currentHp = monster.currentHp - damage
-        addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
+        addGameEvent(`${this._name} hit ${monster.name} with a ${this._weapon} for ${damage} damage.`)
       } else {
         addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
       }
@@ -521,14 +521,13 @@ class ActiveCharacter {
     if (monsterSelection > 50) {
       const page = Math.ceil((monsterSelection + 1) / 50)
       monsterSelection = monsterSelection % 50
-      monsterList = this.fetchMonsterList(`${monsterList.next.split('&')[0]}&page=${page}`).then(json => {
+      monsterList = this.fetchMonsterList(`${monsterList.results[0].challenge_rating}&page=${page}`).then(json => {
         this.createMonsterFromResult(json, monsterSelection)
       })
     } else {
       this.createMonsterFromResult(monsterList, monsterSelection)
     }
   }
-
   fightEvil() {
     const difficulty = Math.floor(Math.random() * 4)
     // 25% chance of easy battle, 50% chance of medium battle, 25% chance of hard battle
