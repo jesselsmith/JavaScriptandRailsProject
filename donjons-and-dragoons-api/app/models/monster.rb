@@ -99,7 +99,7 @@ class Monster < ApplicationRecord
     attack[:desc].split('Hit: ')[1].split(' ').first.to_i
   end
 
-  def treasure()
+  def self.treasure()
     treasure_array = [
       {
         xp_cutoff: 1100,
@@ -145,7 +145,7 @@ class Monster < ApplicationRecord
     end
     d100_roll = rand(1..100)
     treasure_amount = treasure_hash[:treasure_table].find do |treasure_entry|
-      treasure_entry[:upper_limit] <= d100_roll
+      d100_roll <= treasure_entry[:upper_limit]
     end
     treasure_amount[:treasure]
   end

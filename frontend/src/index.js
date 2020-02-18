@@ -463,6 +463,7 @@ class ActiveCharacter {
     else if (attackRoll >= monster.armorClass) {
       const damage = this.damageRoll
       monster.currentHp = monster.currentHp - damage
+      debugger
       addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
@@ -521,6 +522,7 @@ class ActiveCharacter {
     if (monsterSelection > 50) {
       const page = Math.ceil(monsterSelection + 1 / 50)
       monsterSelection = monsterSelection % 50
+      debugger
       monsterList = this.fetchMonsterList(`${monsterList.next.split('&')[0]}&page=${page}`).then(json => {
         this.createMonsterFromResult(json, monsterSelection)
       })
@@ -704,6 +706,7 @@ class ActiveMonster {
       })
       .then(json => {
         if (json && json.data) {
+          debugger
           return json.data.attributes[fieldToUpdate]
         } else {
           console.log(json)
