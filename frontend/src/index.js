@@ -723,7 +723,6 @@ class ActiveMonster {
           this.displayStats()
         } else {
           console.log(json)
-          return this['_' + fieldToUpdate]
         }
       })
   }
