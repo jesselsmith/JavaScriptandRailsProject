@@ -141,12 +141,12 @@ class Monster < ApplicationRecord
     ]
 
     treasure_hash = treasure_array.find do |treasure_table_hash|
-      treasure_table_hash[xp_cutoff] >= xp_granted
+      treasure_table_hash[:xp_cutoff] >= xp_granted
     end
     d100_roll = rand(1..100)
-    treasure_amount = treasure_hash[treasure_table].find do |treasure_entry|
-      treasure_entry[upper_limit] <= d100_roll
+    treasure_amount = treasure_hash[:treasure_table].find do |treasure_entry|
+      treasure_entry[:upper_limit] <= d100_roll
     end
-    treasure_amount[treasure]
+    treasure_amount[:treasure]
   end
 end
