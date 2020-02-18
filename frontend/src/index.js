@@ -463,7 +463,6 @@ class ActiveCharacter {
     else if (attackRoll >= monster.armorClass) {
       const damage = this.damageRoll
       monster.currentHp = monster.currentHp - damage
-      debugger
       addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
@@ -498,7 +497,7 @@ class ActiveCharacter {
       statDisplay = document.createElement('div')
       statDisplay.setAttribute('id', `${this.name}-stats`)
     }
-    statDisplay.textContent = `${this.name}, Level: ${this.level}, HP: ${this.currentHp} / ${this.maxHp}`
+    statDisplay.textContent = `${this.name}, Level: ${this.level}, HP: ${this.currentHp} / ${this.maxHp}, Gold: ${this.gold}`
     return statDisplay
   }
 
@@ -661,11 +660,17 @@ class ActiveMonster {
       update: { 'current_hp': newHp },
       callback: () => {
         if (this._current_hp <= 0) {
-          addGameEvent(`${this._name} has been defeated!`)
-          activeCharacter.gainXp(this._xp_granted)
+          this.dies()
         }
       }
     })
+  }
+
+  dies() {
+    addGameEvent(`${this._name} has been defeated!`)
+    activeCharacter.gainXp(this._xp_granted)
+    activeCharacter.gold = activeCharacter.gold + this.gold
+    addGameEvent(`${activeCharacter.name} finds ${this.gold}gp!`)
   }
 
   displayStats() {
@@ -690,7 +695,7 @@ class ActiveMonster {
     }
     else if (attackRoll >= character.armorClass) {
       character.currentHp = character.currentHp - this.damage
-      addGameEvent(`${this._name} hit ${character.name} for ${damage} damage.`)
+      addGameEvent(`${this._name} hit ${character.name} for ${this.damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${character.name}.`)
     }
