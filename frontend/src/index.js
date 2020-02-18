@@ -258,7 +258,10 @@ function setUpBattleButtons() {
 }
 
 function setUpAttackButton() {
-
+  attackButton = document.getElementById('attack')
+  attackButton.addEventListener('click', e => {
+    activeCharacter.extraAttack(activeMonster)
+  })
 }
 
 function setUpFleeButton() {
@@ -443,7 +446,7 @@ class ActiveCharacter {
     const attackRoll = this.attackBonus + dieRoll
     if (dieRoll === 20) {
       const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
-      monster.currentHp -= critDamage
+      monster.currentHp = monster.currentHp - critDamage
       addGameEvent(`${this._name} critically hit ${monster.name} with their ${this._weapon} for ${damage} damage!!`)
     }
     else if (dieRoll === 1) {
@@ -451,16 +454,20 @@ class ActiveCharacter {
     }
     else if (attackRoll >= monster.armorClass) {
       const damage = this.damageRoll
-      monster.currentHp -= damage
+      monster.currentHp = monster.currentHp - damage
       addGameEvent(`${this._name} hit ${monster.name} with their ${this._weapon} for ${damage} damage.`)
     } else {
       addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
     }
+    monster.displayStats()
   }
 
   extraAttack(monster, advantage = 'straight') {
     for (let i = 0; i < this.numAttacks; i++) {
       this.attack(monster, advantage)
+    }
+    if (monster.currentHp > 0) {
+      monster.attack(this)
     }
   }
 
@@ -506,7 +513,7 @@ class ActiveCharacter {
     if (monsterSelection > 50) {
       const page = Math.ceil(monsterSelection + 1 / 50)
       monsterSelection = monsterSelection % 50
-      monsterList = this.fetchMonsterList(`${crToFight}&page=${page}`).then(json => {
+      monsterList = this.fetchMonsterList(`${monsterList.next.split('&')[0]}&page=${page}`).then(json => {
         this.createMonsterFromResult(json, monsterSelection)
       })
     } else {
@@ -648,6 +655,27 @@ class ActiveMonster {
     }
     statDisplay.textContent = `${this.name}, HP: ${Math.round(this.currentHp / this.maxHp * 100)}%`
     return statDisplay
+  }
+
+  attack(character, advantage = 'straight') {
+    const dieRoll = this.advantageRoll(advantage)
+    const attackRoll = this.attackBonus + dieRoll
+    if (dieRoll === 20) {
+      const critDamage = this.damage + this.damage
+      character.currentHp = character.currentHp - critDamage
+      addGameEvent(`${this._name} critically hit ${character.name} for ${damage} damage!!`)
+    }
+    else if (dieRoll === 1) {
+      addGameEvent(`${this._name}'s attack critically missed ${character.name}!`)
+    }
+    else if (attackRoll >= character.armorClass) {
+      const damage = this.damageRoll
+      character.currentHp = character.currentHp - damage
+      addGameEvent(`${this._name} hit ${character.name} for ${damage} damage.`)
+    } else {
+      addGameEvent(`${this._name}'s attack missed ${character.name}.`)
+    }
+    character.displayStats()
   }
   _updateMonster(fieldToUpdate, newValue) {
     const monster = { monster: {} }
