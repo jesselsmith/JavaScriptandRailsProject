@@ -709,12 +709,13 @@ class ActiveMonster {
       })
       .then(json => {
         if (json && json.data) {
-          Object.keys(updateObject).forEach(key => {
+          Object.keys(updateObject.update).forEach(key => {
             this['_' + key] = json.data.attributes[key]
           })
           if ('callback' in updateObject) {
             updateObject.callback()
           }
+          this.displayStats()
         } else {
           console.log(json)
           return this['_' + fieldToUpdate]
