@@ -217,7 +217,7 @@ function setUpLogOutButton() {
       method: 'DELETE',
       headers: HEADERS
     }).then(resp => {
-      setToken.call(resp)
+      currentToken = ""
       removeCharactersFromList()
       switchDisplayElements()
     })
@@ -528,8 +528,6 @@ class ActiveCharacter {
     this.fetchMonsterList(crToFight).then(this.createMonsterFromList)
   }
 
-
-
   async fetchMonsterList(crAndOrPageNumber) {
     const resp = await fetch(EXTERNAL_API_BASE + `/?challenge_rating=${crAndOrPageNumber}`)
     return await resp.json()
@@ -645,6 +643,10 @@ class ActiveMonster {
 
   set currentHp(newHp) {
     this._current_hp = this._updateMonster('current_hp', newHp)
+    if (this._current_hp <= 0) {
+      addGameEvent(`${this._name} has been defeated!`)
+      activeCharacter.gainXp(this._xp_granted)
+    }
   }
 
   displayStats() {

@@ -98,4 +98,55 @@ class Monster < ApplicationRecord
   def self.damage_from_attack(attack)
     attack[:desc].split('Hit: ')[1].split(' ').first.to_i
   end
+
+  def treasure()
+    treasure_array = [
+      {
+        xp_cutoff: 1100,
+        treasure_table: [
+          { upper_limit: 30, treasure: 0.17 },
+          { upper_limit: 60, treasure: 1.4 },
+          { upper_limit: 70, treasure: 5 },
+          { upper_limit: 95, treasure: 10 },
+          { upper_limit: 100, treasure: 30 }
+        ]
+      },
+      {
+        xp_cutoff: 5900,
+        treasure_table: [
+          { upper_limit: 30, treasure: 31.5 },
+          { upper_limit: 60, treasure: 91 },
+          { upper_limit: 70, treasure: 245 },
+          { upper_limit: 95, treasure: 140 },
+          { upper_limit: 100, treasure: 170 }
+        ]
+      },
+      {
+        xp_cutoff: 15_000,
+        treasure_table: [
+          { upper_limit: 20, treasure: 175},
+          { upper_limit: 35, treasure: 525 },
+          { upper_limit: 75, treasure: 1050 },
+          { upper_limit: 100, treasure: 1400 }
+        ]
+      },
+      {
+        xp_cutoff: Float::INFINITY,
+        treasure_table: [
+          { upper_limit: 15, treasure: 6300},
+          { upper_limit: 55, treasure: 7000 },
+          { upper_limit: 100, treasure: 10_500 }
+        ]
+      }
+    ]
+
+    treasure_hash = treasure_array.find do |treasure_table_hash|
+      treasure_table_hash[xp_cutoff] >= xp_granted
+    end
+    d100_roll = rand(1..100)
+    treasure_amount = treasure_hash[treasure_table].find do |treasure_entry|
+      treasure_entry[upper_limit] <= d100_roll
+    end
+    treasure_amount[treasure]
+  end
 end

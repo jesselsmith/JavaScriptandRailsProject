@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_011217) do
     t.string "armor"
     t.string "weapon"
     t.integer "xp"
+    t.decimal "gold", precision: 15, scale: 2
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
