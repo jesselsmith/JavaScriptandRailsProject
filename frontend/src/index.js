@@ -303,7 +303,7 @@ class ActiveCharacter {
     this._weapon = character.attributes.weapon
     this._xp = character.attributes.xp
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
-    this._gold = character.attributes.gold
+    this._gold = parseFloat(character.attributes.gold)
   }
 
   get name() {
@@ -547,7 +547,11 @@ class ActiveCharacter {
     }
     fetch(BASE_URL + `/characters/${this._id}`, {
       method: "PATCH",
-      headers: HEADERS,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": currentToken
+      },
       body: JSON.stringify(character)
     })
       .then(resp => {
@@ -615,7 +619,7 @@ class ActiveMonster {
     this._armor_class = monster.armor_class
     this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
-    this._gold = monster.gold
+    this._gold = parseFloat(monster.gold)
   }
 
   get name() {

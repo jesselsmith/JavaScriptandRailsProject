@@ -30,7 +30,6 @@ class CharactersController < ApplicationController
   end
 
   def update
-    binding.pry
     render_character { @character.update(update_character_params(params)) }
   end
 
