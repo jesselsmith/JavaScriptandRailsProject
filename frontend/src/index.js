@@ -4,7 +4,7 @@ let currentToken = ""
 let activeCharacter
 let activeMonster
 const HEADERS = {
-  "Content-Type": "application/json; charset=UTF-8",
+  "Content-Type": "application/json",
   "Accept": "application/json",
   "Authorization": currentToken
 }
@@ -519,9 +519,8 @@ class ActiveCharacter {
   createMonsterFromList = (monsterList) => {
     let monsterSelection = rollDie(parseInt(monsterList.count)) - 1
     if (monsterSelection > 50) {
-      const page = Math.ceil(monsterSelection + 1 / 50)
+      const page = Math.ceil((monsterSelection + 1) / 50)
       monsterSelection = monsterSelection % 50
-      debugger
       monsterList = this.fetchMonsterList(`${monsterList.next.split('&')[0]}&page=${page}`).then(json => {
         this.createMonsterFromResult(json, monsterSelection)
       })
@@ -651,8 +650,8 @@ class ActiveMonster {
     return this._damage
   }
 
-  get treasure() {
-    return this._treasure
+  get gold() {
+    return this._gold
   }
 
   set currentHp(newHp) {
