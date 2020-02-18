@@ -617,7 +617,7 @@ class ActiveMonster {
     this._armor_class = monster.armor_class
     this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
-    this._treasure = monster.treasure
+    this._gold = monster.gold
   }
 
   get name() {
@@ -702,6 +702,7 @@ class ActiveMonster {
     })
       .then(resp => {
         setToken.call(resp)
+        debugger
         return resp.json()
       })
       .then(json => {
