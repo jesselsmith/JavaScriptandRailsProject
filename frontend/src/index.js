@@ -487,7 +487,7 @@ class ActiveCharacter {
 
   longRest() {
     addGameEvent(`${this.name} found a place to hide away and catch some shut eye.`)
-    const newHitDice = Math.min(this.level, this.hitDice + Math.ceil(level / 2))
+    const newHitDice = Math.min(this.level, this.hitDice + Math.ceil(this.level / 2))
     this._updateCharacter({ 'current_hp': this.maxHp, 'hit_dice': newHitDice, 'secondWindUsed': false })
   }
 
@@ -607,6 +607,8 @@ class ActiveCharacter {
           }
         }
       })
+    } else {
+      monster.attack(this)
     }
   }
 
