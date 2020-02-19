@@ -284,7 +284,7 @@ function setUpShortRestButton() {
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
     if (interruptTheShortRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to rest!`)
-      fightEvil(true)
+      activeCharacter.fightEvil(true)
     } else {
       activeCharacter.shortRest()
       document.getElementById('second-wind').removeAttribute('disabled')
@@ -302,7 +302,7 @@ function setUpLongRestButton() {
   longRestButton.addEventListener('click', () => {
     if (interruptTheLongRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to sleep!`)
-      fightEvil(true)
+      activeCharacter.fightEvil(true)
     } else {
       activeCharacter.longRest()
       document.getElementById('second-wind').removeAttribute('disabled')

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_19_072459) do
+ActiveRecord::Schema.define(version: 2020_02_19_102537) do
 
   create_table "characters", force: :cascade do |t|
     t.string "name"
@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(version: 2020_02_19_072459) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "hit_dice", default: 1
     t.boolean "second_wind_used", default: false, null: false
+    t.integer "encounters_since_short_rest", default: 0, null: false
+    t.integer "encounters_since_long_rest", default: 0, null: false
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
 
