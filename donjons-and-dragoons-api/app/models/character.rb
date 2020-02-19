@@ -7,6 +7,8 @@ class Character < ApplicationRecord
   validates :xp, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :gold, numericality: { greater_than_or_equal_to: 0 }
   validates :name, uniqueness: { scope: :user, message: "can't have more than one character with the same name" }
+  validates :encounters_since_short_rest, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :encounters_since_long_rest, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   def max_hp()
     self.level * 9 + 4 if self.level

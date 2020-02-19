@@ -268,20 +268,34 @@ function setUpFightEvilButton() {
   fightEvil = document.getElementById('fight-evil')
   fightEvil.addEventListener('click', e => {
     activeCharacter.fightEvil()
-    document.getElementById('exploration-buttons').classList.add('hidden')
-    document.getElementById('battle-buttons').classList.remove('hidden')
-    document.getElementById('monster-stats').classList.remove('hidden')
+    battleDisplay()
   })
+}
+
+function battleDisplay() {
+  document.getElementById('exploration-buttons').classList.add('hidden')
+  document.getElementById('battle-buttons').classList.remove('hidden')
+  document.getElementById('monster-stats').classList.remove('hidden')
 }
 
 function setUpShortRestButton() {
   shortRestButton = document.getElementById('short-rest')
   shortRestButton.addEventListener('click', () => {
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
-    activeCharacter.shortRest()
-    document.getElementById('second-wind').removeAttribute('disabled')
+    if (interruptTheShortRest()) {
+      fightEvil(true)
+    } else {
+      activeCharacter.shortRest()
+      document.getElementById('second-wind').removeAttribute('disabled')
+    }
   })
 }
+
+function interruptTheShortRest() {
+  encounterRoll = rollDie(100)
+  return (encounterRoll <= (95 - (35 * activeCharacter.encountersSinceAnyRest)))
+}
+
 function setUpLongRestButton() {
   longRestButton = document.getElementById('long-rest')
   longRestButton.addEventListener('click', () => {
@@ -427,22 +441,26 @@ class ActiveCharacter {
   }
 
   get encountersSinceLongRest() {
+    return this._encounters_since_long_rest
+  }
 
+  get encountersSinceAnyRest() {
+    return Math.min(this._encounters_since_long_rest, this._encounters_since_short_rest)
   }
   set currentHp(newHp) {
-    this._updateCharacter({ 'current_hp': Math.max(newHp, 0) })
+    this._updateCharacter({ character: { 'current_hp': Math.max(newHp, 0) } })
   }
 
   set armor(newArmor) {
-    this._updateCharacter({ 'armor': newArmor })
+    this._updateCharacter({ character: { 'armor': newArmor } })
   }
 
   set weapon(newWeapon) {
-    this._updateCharacter({ 'weapon': newWeapon })
+    this._updateCharacter({ character: { 'weapon': newWeapon } })
   }
 
   set gold(newGoldAmount) {
-    this._updateCharacter({ 'gold': newGoldAmount })
+    this._updateCharacter({ character: { 'gold': newGoldAmount } })
   }
 
   set currentMonsterId(newMonsterId) {
@@ -450,7 +468,7 @@ class ActiveCharacter {
   }
 
   set secondWindUsed(boolean) {
-    this._updateCharacter({ 'second_wind_used': boolean })
+    this._updateCharacter({ character: { 'second_wind_used': boolean } })
   }
   gainXp(xpGained) {
     const updateObject = { 'xp': this._xp + xpGained }
@@ -469,7 +487,7 @@ class ActiveCharacter {
   secondWind() {
     if (!this.secondWindUsed && (this.currentHp < this.maxHp)) {
       const hpRegain = Math.min(rollDie(10) + this.level, this.maxHp - this.currentHp)
-      this._updateCharacter({ 'second_wind_used': true, 'current_hp': this.currentHp + hpRegain })
+      this._updateCharacter({ character: { 'second_wind_used': true, 'current_hp': this.currentHp + hpRegain } })
       addGameEvent(`${this.name} took a deep breath and recovered ${pluralize('hit point', hpRegain, true)}`)
     }
   }
@@ -486,19 +504,19 @@ class ActiveCharacter {
       newHp = Math.min(newHp + rollDie(10) + 3, this.maxHp)
       newHitDice--
     }
-    let updateObject = { 'second_wind_used': false }
+    let updateObject = { 'second_wind_used': false, 'encountersSinceShortRest': 0 }
     if (newHp !== this.currentHp) {
       addGameEvent(`${this.name} rolled ${this.hitDice - newHitDice} hit ${pluralize('die', this.hitDice - newHitDice)} and regained ${pluralize('hit point', newHp - this.currentHp, true)}.`)
       addGameEvent(`${this.name} has ${newHitDice} hit ${pluralize('die', newHitDice)} left.`)
       updateObject = Object.assign(updateObject, { 'current_hp': newHp, 'hit_dice': newHitDice })
     }
-    this._updateCharacter(updateObject)
+    this._updateCharacter({ character: updateObject })
   }
 
   longRest() {
     addGameEvent(`${this.name} found a place to hide away and catch some shut eye.`)
     const newHitDice = Math.min(this.level, this.hitDice + Math.ceil(this.level / 2))
-    this._updateCharacter({ 'current_hp': this.maxHp, 'hit_dice': newHitDice, 'secondWindUsed': false })
+    this._updateCharacter({ character: { 'current_hp': this.maxHp, 'hit_dice': newHitDice, 'secondWindUsed': false, 'encounters_since_long_rest': 0 } })
   }
 
   get maxHp() {
@@ -648,37 +666,54 @@ class ActiveCharacter {
     return `Attack Bonus: +${this.attackBonus}, Damage: ${this.damageRange}, Armor Class: ${this.armorClass}`
   }
 
-  createMonsterFromResult = (monsterList, monsterSelection) => {
+  createMonsterFromResult = (monsterList, monsterSelection, surprised = false) => {
     new ActiveMonster({
       source: `${EXTERNAL_API_BASE}/${monsterList.results[monsterSelection].slug}`,
       callback: newMonster => {
         activeMonster = newMonster
         addGameEvent(`You have encountered ${activeMonster.name}!`)
         activeMonster.displayStats()
-        if (rollDie(2) - 1) {
-          addGameEvent(`${activeMonster.name} got the jump on ${activeCharacter.name}!`)
-          activeMonster.attack(activeCharacter)
-        }
+        activeCharacter.incrementEncounters(() => {
+          if ((rollDie(2) - 1) || surprised) {
+            addGameEvent(`${activeMonster.name} got the jump on ${activeCharacter.name}!`)
+            let advantage = 'straight'
+            if (surprised) {
+              advantage = 'advantage'
+              addGameEvent(`${activeMonster.name} surprised ${activeCharacter.name} and got advantage to hit!`)
+            }
+            activeMonster.attack(activeCharacter, advantage)
+          }
+        })
       }
     })
   }
-  createMonsterFromList = (monsterList) => {
+
+  incrementEncounters(callback) {
+    this._updateCharacter({
+      character: {
+        encounters_since_long_rest: this.encountersSinceLongRest + 1,
+        encounters_since_short_rest: this.encountersSinceShortRest + 1
+      },
+      callback: callback
+    })
+  }
+  createMonsterFromList = (monsterList, surprised = false) => {
     let monsterSelection = rollDie(parseInt(monsterList.count)) - 1
     if (monsterSelection > 50) {
       const page = Math.ceil((monsterSelection + 1) / 50)
       monsterSelection = monsterSelection % 50
       monsterList = this.fetchMonsterList(`${monsterList.results[0].challenge_rating}&page=${page}`).then(json => {
-        this.createMonsterFromResult(json, monsterSelection)
+        this.createMonsterFromResult(json, monsterSelection, surprised)
       })
     } else {
-      this.createMonsterFromResult(monsterList, monsterSelection)
+      this.createMonsterFromResult(monsterList, monsterSelection, surprised)
     }
   }
-  fightEvil() {
+  fightEvil(surprised = false) {
     const difficulty = Math.floor(Math.random() * 4)
     // 25% chance of easy battle, 50% chance of medium battle, 25% chance of hard battle
     const crToFight = this.appropriate_crs_to_fight[Math.ceil(difficulty / 2)]
-    this.fetchMonsterList(crToFight).then(this.createMonsterFromList)
+    this.fetchMonsterList(crToFight).then((monsterList) => this.createMonsterFromList(monsterList, surprised))
   }
 
   async fetchMonsterList(crAndOrPageNumber) {
@@ -689,13 +724,11 @@ class ActiveCharacter {
   defeatMonster(xpGained, goldGained) {
     let updateObject = this.gainXp(xpGained)
     addGameEvent(`${activeCharacter.name} finds ${goldGained}gp!`)
-    this._updateCharacter(Object.assign(updateObject, { 'gold': this.gold + goldGained }))
+    this._updateCharacter({ character: Object.assign(updateObject, { 'gold': this.gold + goldGained }) })
   }
 
   _updateCharacter(objectForUpdating) {
-    const character = {
-      character: objectForUpdating
-    }
+    const character = { character: objectForUpdating.character }
     fetch(BASE_URL + `/characters/${this._id}`, {
       method: "PATCH",
       headers: {
@@ -711,13 +744,16 @@ class ActiveCharacter {
       })
       .then(json => {
         if (json && json.data) {
-          Object.keys(objectForUpdating).forEach(key => {
+          Object.keys(objectForUpdating.character).forEach(key => {
             this['_' + key] = json.data.attributes[key]
           })
-          if ('level' in objectForUpdating) {
+          if ('level' in objectForUpdating.character) {
             this._appropriate_crs_to_fight = json.data.attributes.appropriate_crs_to_fight
           }
           this.displayStats()
+          if (callback in objectForUpdating) {
+            objectForUpdating.callback()
+          }
         } else {
           console.log(json)
         }
