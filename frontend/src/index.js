@@ -145,20 +145,21 @@ function switchLoggedInElements() {
 }
 
 function setUpNewCharacterButton() {
-  document.getElementById("new-character-btn").addEventListener("click", () => {
+  document.getElementById("new-character-btn").addEventListener("click", e => {
     disableButtonTemporarily(e.target)
-    document.getElementById("new-character-form").addEventListener("submit", e => {
-      disableButtonTemporarily(document.getElementById('add-character'))
+    document.getElementById('new-character-form').addEventListener('submit', e => e.preventDefault())
+    document.getElementById('add-character').addEventListener("click", e => {
+      disableButtonTemporarily(e.target)
       e.preventDefault()
       newCharInfo = {
         character: {
-          name: e.target.querySelector("#character_name").value
+          name: document.getElementById('character_name').value
         }
       }
       fetchPoster(BASE_URL + "/characters", newCharInfo, true)
         .then(processNewCharacter)
       document.getElementById("new-character-span").classList.add("hidden")
-      e.target.reset()
+      document.getElementById('new-character-form').reset()
     }, false)
     document.getElementById("new-character-span").classList.remove("hidden")
   })
