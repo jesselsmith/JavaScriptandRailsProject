@@ -285,6 +285,7 @@ function setUpShortRestButton() {
     if (interruptTheShortRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to rest!`)
       activeCharacter.fightEvil(true)
+      battleDisplay()
     } else {
       activeCharacter.shortRest()
       document.getElementById('second-wind').removeAttribute('disabled')
@@ -303,6 +304,7 @@ function setUpLongRestButton() {
     if (interruptTheLongRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to sleep!`)
       activeCharacter.fightEvil(true)
+      battleDisplay()
     } else {
       activeCharacter.longRest()
       document.getElementById('second-wind').removeAttribute('disabled')
@@ -769,7 +771,7 @@ class ActiveCharacter {
             this._appropriate_crs_to_fight = json.data.attributes.appropriate_crs_to_fight
           }
           this.displayStats()
-          if (callback in objectForUpdating) {
+          if ('callback' in objectForUpdating) {
             objectForUpdating.callback()
           }
         } else {
@@ -884,7 +886,7 @@ class ActiveMonster {
     leaveBattle()
   }
 
-  destroy(callback) {
+  destroy(callback = () => { }) {
     fetch(`${BASE_URL}/monsters/${this._id}`, {
       method: 'DELETE',
       headers: {
