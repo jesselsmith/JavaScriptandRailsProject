@@ -212,16 +212,15 @@ function createPlayButton(character) {
   return playButton
 }
 
-function fetchActiveMonster(monsterId) {
-  return fetch(`${BASE_URL}/monsters/${monsterId}`, {
+async function fetchActiveMonster(monsterId) {
+  const resp = await fetch(`${BASE_URL}/monsters/${monsterId}`, {
     method: 'GET',
     headers: { "Accept": "application/json" }
-  }).then(resp => resp.json())
-    .then(json => {
-      activeMonster = new ActiveMonster({ json: json })
-      activeMonster.displayStats()
-      addGameEvent(`${activeCharacter.name}'s battle with ${activeMonster.name} continues!`)
-    })
+  })
+  const json = await resp.json()
+  activeMonster = new ActiveMonster({ json: json })
+  activeMonster.displayStats()
+  addGameEvent(`${activeCharacter.name}'s battle with ${activeMonster.name} continues!`)
 }
 
 
@@ -352,6 +351,7 @@ class ActiveCharacter {
     this._xp = character.attributes.xp
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
     this._gold = parseFloat(character.attributes.gold)
+    this._hit_dice = character.attributes.hit_dice
     if (character.relationships.monster.data) {
       this._current_monster_id = character.relationships.monster.data.id
     } else {
@@ -392,6 +392,11 @@ class ActiveCharacter {
   get currentMonsterId() {
     return this._current_monster_id
   }
+
+  get hitDice() {
+    return this._hit_dice
+  }
+
   set currentHp(newHp) {
     this._updateCharacter({ 'current_hp': newHp })
   }
@@ -419,9 +424,23 @@ class ActiveCharacter {
     if (newLevel !== this._level) {
       updateObject['level'] = newLevel
       updateObject['current_hp'] = this._current_hp + 9 * (newLevel - this._level)
+      updateObject['hit_dice'] = this._hit_dice + 1
       addGameEvent(`${this._name} is now level ${newLevel}!`)
     }
     this._updateCharacter(updateObject)
+  }
+
+  spendHitDice() {
+    let newHp = this.currentHp
+    let newHitDice = this.hitDice
+    while (hitDice > 0 && newHp < this.maxHp) {
+      newHp += rollDie(10) + 3
+      newHitDice--
+    }
+    if (currentHp !== this.currentHp) {
+      addGameEvent(`${this.name} rolled ${this.hitDice - newHitDice} hit dice and regained ${this.currentHp - newHp} hit points.`)
+      this._updateCharacter({ 'current_hp': newHp, 'hit_dice': newHitDice })
+    }
   }
 
   get maxHp() {
@@ -435,7 +454,6 @@ class ActiveCharacter {
   get attackBonus() {
     return this.proficiency + this.strengthBonus
   }
-
 
   get strengthBonus() {
     if (this._level >= 6) {
