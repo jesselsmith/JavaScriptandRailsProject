@@ -2,6 +2,12 @@ class Character < ApplicationRecord
   belongs_to :user
   has_one :monster, dependent: :destroy
 
+  validates :current_hp, numericality: { only_integer: true, less_than_or_equal_to: :max_hp, greater_than_or_equal_to: 0 }
+  validates :hit_dice, numericality: { only_integer: true, less_than_or_equal_to: :level, greater_than_or_equal_to: 0 }
+  validates :xp, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :gold, numericality: { greater_than_or_equal_to: 0 }
+  validates :name, uniqueness: { scope: :user, message: "can't have more than one character with the same name" }
+
   def max_hp()
     self.level * 9 + 4 if self.level
   end

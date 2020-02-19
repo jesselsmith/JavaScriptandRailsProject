@@ -1,7 +1,9 @@
 class Monster < ApplicationRecord
   
   belongs_to :character
-  validates :name, uniqueness: true
+  validates :current_hp, numericality: { only_integer: true, less_than_or_equal_to: :max_hp, greater_than_or_equal_to: 0 }
+  validates :attack_bonus, numericality: { only_integer: true }
+  validates :damage, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   def self.new_monster_from_api(api_monster)
     monster_hash = {}

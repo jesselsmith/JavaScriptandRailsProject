@@ -21,7 +21,12 @@ class MonstersController < ApplicationController
   end
 
   def update
-    render_monster { @monster.update(update_monster_params(params)) }
+    render_monster do
+      if (params[:monster].key? :current_hp) && (params[:monster][:current_hp].negative?)
+        params[:monster][:current_hp] = 0
+      end
+      @monster.update(update_monster_params(params))
+    end
   end
 
   def destroy

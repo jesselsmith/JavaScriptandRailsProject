@@ -237,6 +237,13 @@ function setUpLogOutButton() {
       headers: HEADERS
     }).then(resp => {
       currentToken = ""
+      activeCharacter = null
+      activeMonster = null
+      document.getElementById('gameplay-area').classList.add('hidden')
+      document.getElementById('exploration-buttons').classList.add('hidden')
+      document.getElementById('battle-buttons').classList.add('hidden')
+      document.getElementById('monster-stats').classList.add('hidden')
+      document.getElementById('game-summary').classList.remove("hidden")
       removeCharactersFromList()
       switchDisplayElements()
     })
@@ -293,6 +300,13 @@ function setUpFleeButton() {
   })
 }
 
+function setUpDodgeButton() {
+  dodgeButton = document.getElementById('dodge')
+  dodgeButton.addEventListener('click', () => {
+    activeMonster.attack(activeCharacter, 'disadvantage')
+  })
+}
+
 function setUpSecondWindButton() {
 
 }
@@ -324,6 +338,7 @@ function leaveBattle() {
   monsterStats = document.getElementById('monster-stats')
   monsterStats.removeChild(monsterStats.firstChild)
   monsterStats.classList.add('hidden')
+  activeMonster = null
 }
 
 class ActiveCharacter {
