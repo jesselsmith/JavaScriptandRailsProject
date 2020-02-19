@@ -203,7 +203,7 @@ function createPlayButton(character) {
     document.getElementById('change-character').removeAttribute('disabled')
     activeCharacter = new ActiveCharacter(character)
     const pcStats = document.getElementById('pc-stats')
-    pcStats.removeChild(pcStats.firstChild)
+    pcStats.innerHTML = ''
     pcStats.appendChild(activeCharacter.displayStats())
     if (activeCharacter.currentMonsterId) {
       fetchActiveMonster(activeCharacter.currentMonsterId)
