@@ -449,7 +449,7 @@ class ActiveCharacter {
 
   secondWind() {
     if (!this.secondWindUsed && (this.currentHp < this.maxHp)) {
-      const hpRegain = min(rollDie(10) + this.level, this.maxHp - this.currentHp)
+      const hpRegain = Math.min(rollDie(10) + this.level, this.maxHp - this.currentHp)
       this._updateCharacter({ 'second_wind_used': true, 'current_hp': this.currentHp + hpRegain })
       addGameEvent(`${this.name} took a deep breath and recovered ${pluralize('hit point', hpRegain, true)}`)
     }
@@ -458,9 +458,12 @@ class ActiveCharacter {
   shortRest() {
     let newHp = this.currentHp
     let newHitDice = this.hitDice
-    this.secondWind()
+    if (!this.secondWindUsed && (this.currentHp < this.maxHp)) {
+      const hpRegain = Math.min(rollDie(10) + this.level, this.maxHp - this.currentHp)
+      addGameEvent(`${this.name} took a deep breath and recovered ${pluralize('hit point', hpRegain, true)}`)
+    }
     while (newHitDice > 0 && newHp < this.maxHp) {
-      newHp = min(newHp + rollDie(10) + 3, this.maxHp)
+      newHp = Math.min(newHp + rollDie(10) + 3, this.maxHp)
       newHitDice--
     }
     let updateObject = { 'second_wind_used': false }

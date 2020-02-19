@@ -76,6 +76,11 @@ body {
   button.delete {
     background-color: #E1332D;
   }
+
+  button[disabled] {
+    background-color: grey;
+    border-radius: 0px;
+  }
   
   @media only screen and (min-width: 500px) {
     main {
