@@ -274,6 +274,7 @@ function setUpShortRestButton() {
   shortRestButton.addEventListener('click', () => {
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
     activeCharacter.shortRest()
+    document.getElementById('second-wind').removeAttribute('disabled')
   })
 }
 function setUpLongRestButton() {
@@ -311,7 +312,11 @@ function setUpDodgeButton() {
 }
 
 function setUpSecondWindButton() {
-
+  secondWindButton = document.getElementById('second-wind')
+  secondWindButton.addEventListener('click', e => {
+    activeCharacter.secondWind()
+    e.target.setAttribute('disabled', 'disabled')
+  })
 }
 
 function addGameEvent(text) {
