@@ -265,7 +265,9 @@ function setUpAttackButton() {
 }
 
 function setUpFleeButton() {
-
+  addGameEvent(`${activeCharacter.name} attempts to flee--${activeMonster.name} takes an attack of opportunity!`)
+  activeMonster.attack(activeCharacter, 'disadvantage')
+  leaveBattle()
 }
 
 function setUpSecondWindButton() {
@@ -293,6 +295,14 @@ function advantageRoll(advantage) {
   return rollResult
 }
 
+function leaveBattle() {
+  document.getElementById('exploration-buttons').classList.remove('hidden')
+  document.getElementById('battle-buttons').classList.add('hidden')
+  monsterStats = document.getElementById('monster-stats')
+  monsterStats.removeChild(monsterStats.firstChild)
+  monsterStats.classList.add('hidden')
+}
+
 class ActiveCharacter {
   constructor(character) {
     this._id = character.id
@@ -304,8 +314,11 @@ class ActiveCharacter {
     this._xp = character.attributes.xp
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
     this._gold = parseFloat(character.attributes.gold)
+    this._current_monster_id = character.relationships.monster.data.id
   }
-
+  get id() {
+    return this._id
+  }
   get name() {
     return this._name
   }
@@ -333,6 +346,9 @@ class ActiveCharacter {
   get gold() {
     return this._gold
   }
+  get currentMonsterId() {
+    return this._current_monster_id
+  }
   set currentHp(newHp) {
     this._updateCharacter({ 'current_hp': newHp })
   }
@@ -349,6 +365,9 @@ class ActiveCharacter {
     this._updateCharacter({ 'gold': newGoldAmount })
   }
 
+  set currentMonsterId(newMonsterId) {
+    this._current_monster_id = newMonsterId
+  }
   gainXp(xpGained) {
     const updateObject = { 'xp': this._xp + xpGained }
     const xpTable = [300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 14000, 165000, 195000, 225000, 265000, 305000, 355000]
@@ -585,7 +604,8 @@ class ActiveMonster {
           'challenge_rating': '',
           'armor_class': '',
           'actions': []
-        }
+        },
+        character_id: activeCharacter.id
       }
       fetch(args.source, { method: "GET" }).then(resp => resp.json()).then(json => {
         Object.keys(monster_hash.monster).forEach(key => monster_hash.monster[key] = json[key])
@@ -619,6 +639,7 @@ class ActiveMonster {
     this._attack_bonus = monster.attack_bonus
     this._damage = monster.damage
     this._gold = parseFloat(monster.gold)
+    this._character_id = json.data.relationships.character.data.id
   }
 
   get name() {
@@ -657,6 +678,10 @@ class ActiveMonster {
     return this._gold
   }
 
+  get characterId() {
+    return this._character_id
+  }
+
   set currentHp(newHp) {
     this._updateMonster({
       update: { 'current_hp': newHp },
@@ -670,9 +695,27 @@ class ActiveMonster {
 
   dies() {
     addGameEvent(`${this._name} has been defeated!`)
+    this.destroy()
     activeCharacter.gainXp(this._xp_granted)
     activeCharacter.gold = activeCharacter.gold + this.gold
     addGameEvent(`${activeCharacter.name} finds ${this.gold}gp!`)
+    leaveBattle()
+  }
+
+  destroy() {
+    fetch(`${BASE_URL}/monsters/${this.id}`, {
+      method: 'DELETE',
+      headers: {
+        "Accept": "application/json",
+        "Authorization": currentToken
+      }
+    }).then(resp => {
+      setToken.call(resp)
+      return resp.json()
+    }).then(json => {
+      console.log(json)
+      activeCharacter.currentMonsterId = 0
+    })
   }
 
   displayStats() {

@@ -4,7 +4,8 @@ class MonstersController < ApplicationController
     character = Character.find_by(id: params[:character_id])
     if character
       monster = Monster.new_monster_from_api(create_monster_params(params))
-      if monster.valid?
+      monster.character_id = character.id
+      if monster.save
         character.monster = monster
         render json: MonsterSerializer.new(monster)
       else
@@ -16,13 +17,11 @@ class MonstersController < ApplicationController
   end
 
   def update
-    monster = Monster.find(params[:id])
-    if monster
-      monster.update(update_monster_params(params))
-      render json: MonsterSerializer.new(monster)
-    else
-      render json: {message: "That monster could not be found!"}
-    end
+    render_monster { @monster.update(update_monster_params(params)) }
+  end
+
+  def destroy
+    render_monster { @monster.destroy }
   end
 
   private
@@ -33,5 +32,19 @@ class MonstersController < ApplicationController
 
   def update_monster_params(params)
     params.require(:monster).permit(:current_hp)
+  end
+
+  def find_monster
+    Monster.find(params[:id])
+  end
+
+  def render_monster
+    @monster = find_monster
+    if @monster
+      yield
+      render json: MonsterSerializer.new(@monster)
+    else
+      render json: { message: 'That monster could not be found' }
+    end
   end
 end
