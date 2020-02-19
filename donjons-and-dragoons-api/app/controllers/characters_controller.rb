@@ -34,7 +34,7 @@ class CharactersController < ApplicationController
   end
 
   def update_character_params(params)
-    params.require(:character).permit(:name, :level, :armor, :weapon, :current_hp, :xp, :hit_dice, :gold)
+    params.require(:character).permit(:name, :level, :armor, :weapon, :current_hp, :xp, :hit_dice, :gold, :second_wind_used)
   end
 
   def render_character
