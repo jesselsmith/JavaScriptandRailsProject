@@ -198,16 +198,22 @@ function createPlayButton(character) {
     document.getElementById('game-summary').classList.add("hidden")
     document.getElementById('gameplay-area').classList.remove('hidden')
     document.getElementById('game-event-display').innerHTML = ''
+    monsterStats = document.getElementById('monster-stats')
+    monsterStats.innerHTML = ''
+    document.getElementById('change-character').removeAttribute('disabled')
     activeCharacter = new ActiveCharacter(character)
     const pcStats = document.getElementById('pc-stats')
+    pcStats.removeChild(pcStats.firstChild)
     pcStats.appendChild(activeCharacter.displayStats())
     if (activeCharacter.currentMonsterId) {
       fetchActiveMonster(activeCharacter.currentMonsterId)
       document.getElementById('battle-buttons').classList.remove('hidden')
-      document.getElementById('monster-stats').classList.remove('hidden')
-    }
-    else {
+      document.getElementById('exploration-buttons').classList.add('hidden')
+      monsterStats.classList.remove('hidden')
+    } else {
+      document.getElementById('battle-buttons').classList.add('hidden')
       document.getElementById('exploration-buttons').classList.remove('hidden')
+      monsterStats.classList.add('hidden')
     }
     if (activeCharacter.secondWindUsed) {
       document.getElementById('second-wind').setAttribute('disabled', 'disabled')

@@ -129,3 +129,9 @@ body {
     overflow: auto;
     max-height: 70vmax
   }
+  #character-menu{
+    float: left;
+  }
+  #game{
+    display: inline-block;
+  }
