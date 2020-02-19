@@ -283,7 +283,11 @@ function setUpShortRestButton() {
   })
 }
 function setUpLongRestButton() {
-
+  longRestButton = document.getElementById('long-rest')
+  longRestButton.addEventListener('click', () => {
+    activeCharacter.longRest()
+    document.getElementById('second-wind').removeAttribute('disabled')
+  })
 }
 
 function setUpBattleButtons() {
@@ -479,6 +483,12 @@ class ActiveCharacter {
       updateObject = Object.assign(updateObject, { 'current_hp': newHp, 'hit_dice': newHitDice })
     }
     this._updateCharacter(updateObject)
+  }
+
+  longRest() {
+    addGameEvent(`${this.name} found a place to hide away and catch some shut eye.`)
+    const newHitDice = Math.min(this.level, this.hitDice + Math.ceil(level / 2))
+    this._updateCharacter({ 'current_hp': this.maxHp, 'hit_dice': newHitDice, 'secondWindUsed': false })
   }
 
   get maxHp() {
