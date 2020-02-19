@@ -259,15 +259,18 @@ function setUpBattleButtons() {
 
 function setUpAttackButton() {
   attackButton = document.getElementById('attack')
-  attackButton.addEventListener('click', e => {
+  attackButton.addEventListener('click', () => {
     activeCharacter.attack(activeMonster)
   })
 }
 
 function setUpFleeButton() {
-  addGameEvent(`${activeCharacter.name} attempts to flee--${activeMonster.name} takes an attack of opportunity!`)
-  activeMonster.attack(activeCharacter, 'disadvantage')
-  leaveBattle()
+  fleeButton = document.getElementById('flee')
+  fleeButton.addEventListener('click', () => {
+    addGameEvent(`${activeCharacter.name} attempts to flee--${activeMonster.name} takes an attack of opportunity!`)
+    activeMonster.attack(activeCharacter, 'disadvantage')
+    leaveBattle()
+  })
 }
 
 function setUpSecondWindButton() {
@@ -475,7 +478,7 @@ class ActiveCharacter {
       if (dieRoll === 20) {
         const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
         monster.currentHp = monster.currentHp - critDamage
-        addGameEvent(`${this._name} critically hit ${monster.name} with a ${this._weapon} for ${damage} damage!!`)
+        addGameEvent(`${this._name} critically hit ${monster.name} with a ${this._weapon} for ${critDamage} damage!!`)
       }
       else if (dieRoll === 1) {
         addGameEvent(`${this._name}'s attack critically missed ${monster.name}!`)
@@ -703,7 +706,7 @@ class ActiveMonster {
   }
 
   destroy() {
-    fetch(`${BASE_URL}/monsters/${this.id}`, {
+    fetch(`${BASE_URL}/monsters/${this._id}`, {
       method: 'DELETE',
       headers: {
         "Accept": "application/json",
