@@ -207,6 +207,11 @@ function createPlayButton(character) {
     else {
       document.getElementById('exploration-buttons').classList.remove('hidden')
     }
+    if (activeCharacter.secondWindUsed) {
+      document.getElementById('second-wind').setAttribute('disabled', 'disabled')
+    } else {
+      document.getElementById('second-wind').removeAttribute('disabled')
+    }
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
@@ -411,7 +416,7 @@ class ActiveCharacter {
     return this._second_wind_used
   }
   set currentHp(newHp) {
-    this._updateCharacter({ 'current_hp': newHp })
+    this._updateCharacter({ 'current_hp': Math.max(newHp, 0) })
   }
 
   set armor(newArmor) {
@@ -444,7 +449,7 @@ class ActiveCharacter {
       updateObject['hit_dice'] = this._hit_dice + 1
       addGameEvent(`${this._name} is now level ${newLevel}!`)
     }
-    this._updateCharacter(updateObject)
+    return updateObject
   }
 
   secondWind() {
@@ -461,6 +466,7 @@ class ActiveCharacter {
     if (!this.secondWindUsed && (this.currentHp < this.maxHp)) {
       const hpRegain = Math.min(rollDie(10) + this.level, this.maxHp - this.currentHp)
       addGameEvent(`${this.name} took a deep breath and recovered ${pluralize('hit point', hpRegain, true)}`)
+      newHp += hpRegain
     }
     while (newHitDice > 0 && newHp < this.maxHp) {
       newHp = Math.min(newHp + rollDie(10) + 3, this.maxHp)
@@ -562,12 +568,13 @@ class ActiveCharacter {
   }
 
   attack(monster, advantage = 'straight') {
+    let totalDamage = 0
     for (let i = 0; i < this.numAttacks; i++) {
       const dieRoll = advantageRoll(advantage)
       const attackRoll = this.attackBonus + dieRoll
       if (dieRoll === 20) {
         const critDamage = this.damageRoll + this.damageRoll - this.strengthBonus
-        monster.currentHp = monster.currentHp - critDamage
+        totalDamage += critDamage
         addGameEvent(`${this._name} critically hit ${monster.name} with a ${this._weapon} for ${critDamage} damage!!`)
       }
       else if (dieRoll === 1) {
@@ -575,15 +582,21 @@ class ActiveCharacter {
       }
       else if (attackRoll >= monster.armorClass) {
         const damage = this.damageRoll
-        monster.currentHp = monster.currentHp - damage
+        totalDamage += damage
         addGameEvent(`${this._name} hit ${monster.name} with a ${this._weapon} for ${damage} damage.`)
       } else {
         addGameEvent(`${this._name}'s attack missed ${monster.name}.`)
       }
     }
-    monster.displayStats()
-    if (monster.currentHp > 0) {
-      monster.attack(this)
+    if (totalDamage) {
+      monster.updateMonster({
+        update: { current_hp: Math.max(monster.currentHp - totalDamage, 0) }, callback: () => {
+          monster.displayStats()
+          if (monster.currentHp > 0) {
+            monster.attack(this)
+          }
+        }
+      })
     }
   }
 
@@ -649,6 +662,12 @@ class ActiveCharacter {
   async fetchMonsterList(crAndOrPageNumber) {
     const resp = await fetch(EXTERNAL_API_BASE + `/?challenge_rating=${crAndOrPageNumber}`)
     return await resp.json()
+  }
+
+  defeatMonster(xpGained, goldGained) {
+    let updateObject = this.gainXp(xpGained)
+    addGameEvent(`${activeCharacter.name} finds ${goldGained}gp!`)
+    this._updateCharacter(Object.assign(updateObject, { 'gold': this.gold + goldGained }))
   }
 
   _updateCharacter(objectForUpdating) {
@@ -775,22 +794,16 @@ class ActiveMonster {
   }
 
   set currentHp(newHp) {
-    this._updateMonster({
-      update: { 'current_hp': newHp },
-      callback: () => {
-        if (this._current_hp <= 0) {
-          this.dies()
-        }
-      }
-    })
+    this.updateMonster({
+      update: { 'current_hp': Math.max(newHp, 0) }
+    }
+    )
   }
 
   dies() {
     addGameEvent(`${this._name} has been defeated!`)
+    activeCharacter.defeatMonster(this.xpGranted, this.gold)
     this.destroy()
-    activeCharacter.gainXp(this._xp_granted)
-    activeCharacter.gold = activeCharacter.gold + this.gold
-    addGameEvent(`${activeCharacter.name} finds ${this.gold}gp!`)
     leaveBattle()
   }
 
@@ -823,21 +836,20 @@ class ActiveMonster {
     const dieRoll = advantageRoll(advantage)
     const attackRoll = this.attackBonus + dieRoll
     if (dieRoll === 20) {
-      character.currentHp = character.currentHp - (2 * this.damage)
       addGameEvent(`${this._name} critically hit ${character.name} for ${2 * this.damage} damage!!`)
+      character.currentHp = character.currentHp - (2 * this.damage)
     }
     else if (dieRoll === 1) {
       addGameEvent(`${this._name}'s attack critically missed ${character.name}!`)
     }
     else if (attackRoll >= character.armorClass) {
-      character.currentHp = character.currentHp - this.damage
       addGameEvent(`${this._name} hit ${character.name} for ${this.damage} damage.`)
+      character.currentHp = character.currentHp - this.damage
     } else {
       addGameEvent(`${this._name}'s attack missed ${character.name}.`)
     }
-    character.displayStats()
   }
-  _updateMonster(updateObject) {
+  updateMonster(updateObject) {
     const monster = { monster: updateObject.update }
     fetch(BASE_URL + `/monsters/${this._id}`, {
       method: "PATCH",
@@ -857,6 +869,9 @@ class ActiveMonster {
             updateObject.callback()
           }
           this.displayStats()
+          if (this._current_hp <= 0) {
+            this.dies()
+          }
         } else {
           console.log(json)
         }
