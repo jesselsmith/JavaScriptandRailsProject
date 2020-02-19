@@ -265,7 +265,7 @@ function setUpExplorationButtons() {
 }
 
 function setUpFightEvilButton() {
-  fightEvil = document.getElementById('fight-evil')
+  const fightEvil = document.getElementById('fight-evil')
   fightEvil.addEventListener('click', e => {
     activeCharacter.fightEvil()
     battleDisplay()
@@ -279,10 +279,11 @@ function battleDisplay() {
 }
 
 function setUpShortRestButton() {
-  shortRestButton = document.getElementById('short-rest')
+  const shortRestButton = document.getElementById('short-rest')
   shortRestButton.addEventListener('click', () => {
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
     if (interruptTheShortRest()) {
+      addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to rest!`)
       fightEvil(true)
     } else {
       activeCharacter.shortRest()
@@ -297,11 +298,28 @@ function interruptTheShortRest() {
 }
 
 function setUpLongRestButton() {
-  longRestButton = document.getElementById('long-rest')
+  const longRestButton = document.getElementById('long-rest')
   longRestButton.addEventListener('click', () => {
-    activeCharacter.longRest()
-    document.getElementById('second-wind').removeAttribute('disabled')
+    if (interruptTheLongRest()) {
+      addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to sleep!`)
+      fightEvil(true)
+    } else {
+      activeCharacter.longRest()
+      document.getElementById('second-wind').removeAttribute('disabled')
+    }
   })
+}
+
+function interruptTheLongRest() {
+  const encounterRoll = rollDie(100)
+  const probabilityOfResting = [0, 10, 20, 40, 65, 80, 90, 95, 99]
+  let probability = 0
+  if (activeCharacter.encountersSinceLongRest > probabilityOfResting.length) {
+    probability = 100
+  } else {
+    probability = probabilityOfResting[activeCharacter.encountersSinceLongRest]
+  }
+  return (encounterRoll <= probabilityOfResting)
 }
 
 function setUpBattleButtons() {
@@ -679,7 +697,7 @@ class ActiveCharacter {
             let advantage = 'straight'
             if (surprised) {
               advantage = 'advantage'
-              addGameEvent(`${activeMonster.name} surprised ${activeCharacter.name} and got advantage to hit!`)
+              addGameEvent(`By sneaking up on ${activeCharacter.name}, ${activeMonster.name} got advantage to hit!`)
             }
             activeMonster.attack(activeCharacter, advantage)
           }
