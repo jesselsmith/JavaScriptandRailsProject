@@ -270,7 +270,11 @@ function setUpFightEvilButton() {
 }
 
 function setUpShortRestButton() {
-
+  shortRestButton = document.getElementById('short-rest')
+  shortRestButton.addEventListener('click', () => {
+    addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
+    activeCharacter.spendHitDice()
+  })
 }
 function setUpLongRestButton() {
 
@@ -433,12 +437,13 @@ class ActiveCharacter {
   spendHitDice() {
     let newHp = this.currentHp
     let newHitDice = this.hitDice
-    while (hitDice > 0 && newHp < this.maxHp) {
+    while (newHitDice > 0 && newHp < this.maxHp) {
       newHp += rollDie(10) + 3
       newHitDice--
     }
-    if (currentHp !== this.currentHp) {
-      addGameEvent(`${this.name} rolled ${this.hitDice - newHitDice} hit dice and regained ${this.currentHp - newHp} hit points.`)
+    if (newHp !== this.currentHp) {
+      addGameEvent(`${this.name} rolled ${this.hitDice - newHitDice} hit ${pluralize('die', this.hitDice - newHitDice)} and regained ${pluralize('hit point', newHp - this.currentHp, true)}.`)
+      addGameEvent(`${this.name} has ${newHitDice} hit ${pluralize('die', newHitDice)} left.`)
       this._updateCharacter({ 'current_hp': newHp, 'hit_dice': newHitDice })
     }
   }
