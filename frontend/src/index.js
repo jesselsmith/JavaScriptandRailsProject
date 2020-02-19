@@ -371,6 +371,8 @@ class ActiveCharacter {
     this._gold = parseFloat(character.attributes.gold)
     this._hit_dice = character.attributes.hit_dice
     this._second_wind_used = character.attributes.second_wind_used
+    this._encounters_since_short_rest = character.attributes.encounters_since_short_rest
+    this._encounters_since_long_rest = character.attributes.encounters_since_long_rest
     if (character.relationships.monster.data) {
       this._current_monster_id = character.relationships.monster.data.id
     } else {
@@ -418,6 +420,14 @@ class ActiveCharacter {
 
   get secondWindUsed() {
     return this._second_wind_used
+  }
+
+  get encountersSinceShortRest() {
+    return this._encounters_since_short_rest
+  }
+
+  get encountersSinceLongRest() {
+
   }
   set currentHp(newHp) {
     this._updateCharacter({ 'current_hp': Math.max(newHp, 0) })
