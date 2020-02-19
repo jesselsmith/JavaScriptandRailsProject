@@ -196,13 +196,32 @@ function createPlayButton(character) {
     document.getElementById('character-menu').classList.add('hidden')
     document.getElementById('game-summary').classList.add("hidden")
     document.getElementById('gameplay-area').classList.remove('hidden')
-    document.getElementById('exploration-buttons').classList.remove('hidden')
     activeCharacter = new ActiveCharacter(character)
     const pcStats = document.getElementById('pc-stats')
     pcStats.appendChild(activeCharacter.displayStats())
+    if (activeCharacter.currentMonsterId) {
+      fetchActiveMonster(activeCharacter.currentMonsterId)
+      document.getElementById('battle-buttons').classList.remove('hidden')
+      document.getElementById('monster-stats').classList.remove('hidden')
+    }
+    else {
+      document.getElementById('exploration-buttons').classList.remove('hidden')
+    }
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
   return playButton
+}
+
+function fetchActiveMonster(monsterId) {
+  return fetch(`${BASE_URL}/monsters/${monsterId}`, {
+    method: 'GET',
+    headers: { "Accept": "application/json" }
+  }).then(resp => resp.json())
+    .then(json => {
+      activeMonster = new ActiveMonster({ json: json })
+      activeMonster.displayStats()
+      addGameEvent(`${activeCharacter.name}'s battle with ${activeMonster.name} continues!`)
+    })
 }
 
 
@@ -269,6 +288,7 @@ function setUpFleeButton() {
   fleeButton.addEventListener('click', () => {
     addGameEvent(`${activeCharacter.name} attempts to flee--${activeMonster.name} takes an attack of opportunity!`)
     activeMonster.attack(activeCharacter, 'disadvantage')
+    activeMonster.destroy()
     leaveBattle()
   })
 }
@@ -317,7 +337,12 @@ class ActiveCharacter {
     this._xp = character.attributes.xp
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
     this._gold = parseFloat(character.attributes.gold)
-    this._current_monster_id = character.relationships.monster.data.id
+    if (character.relationships.monster.data) {
+      this._current_monster_id = character.relationships.monster.data.id
+    } else {
+      this._current_monster_id = 0
+    }
+
   }
   get id() {
     return this._id
@@ -529,8 +554,7 @@ class ActiveCharacter {
       callback: newMonster => {
         activeMonster = newMonster
         addGameEvent(`You have encountered ${activeMonster.name}!`)
-        const monsterStats = document.getElementById('monster-stats')
-        monsterStats.appendChild(activeMonster.displayStats())
+        activeMonster.displayStats()
         if (rollDie(2) - 1) {
           addGameEvent(`${activeMonster.name} got the jump on ${activeCharacter.name}!`)
           activeMonster.attack(activeCharacter)
@@ -716,7 +740,6 @@ class ActiveMonster {
       setToken.call(resp)
       return resp.json()
     }).then(json => {
-      console.log(json)
       activeCharacter.currentMonsterId = 0
     })
   }
@@ -726,9 +749,9 @@ class ActiveMonster {
     if (!statDisplay) {
       statDisplay = document.createElement('div')
       statDisplay.setAttribute('id', `${this.name}-stats`)
+      document.getElementById('monster-stats').appendChild(statDisplay)
     }
     statDisplay.textContent = `${this.name}, HP: ${Math.round(this.currentHp / this.maxHp * 100)}%`
-    return statDisplay
   }
 
   attack(character, advantage = 'straight') {

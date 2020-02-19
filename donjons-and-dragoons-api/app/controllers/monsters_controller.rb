@@ -16,6 +16,10 @@ class MonstersController < ApplicationController
     end
   end
 
+  def show
+    render_monster {}
+  end
+
   def update
     render_monster { @monster.update(update_monster_params(params)) }
   end
