@@ -273,7 +273,7 @@ function setUpShortRestButton() {
   shortRestButton = document.getElementById('short-rest')
   shortRestButton.addEventListener('click', () => {
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
-    activeCharacter.spendHitDice()
+    activeCharacter.shortRest()
   })
 }
 function setUpLongRestButton() {
@@ -356,6 +356,7 @@ class ActiveCharacter {
     this._appropriate_crs_to_fight = character.attributes.appropriate_crs_to_fight
     this._gold = parseFloat(character.attributes.gold)
     this._hit_dice = character.attributes.hit_dice
+    this._second_wind_used = character.attributes.second_wind_used
     if (character.relationships.monster.data) {
       this._current_monster_id = character.relationships.monster.data.id
     } else {
@@ -401,6 +402,9 @@ class ActiveCharacter {
     return this._hit_dice
   }
 
+  get secondWindUsed() {
+    return this._second_wind_used
+  }
   set currentHp(newHp) {
     this._updateCharacter({ 'current_hp': newHp })
   }
@@ -420,6 +424,10 @@ class ActiveCharacter {
   set currentMonsterId(newMonsterId) {
     this._current_monster_id = newMonsterId
   }
+
+  set secondWindUsed(boolean) {
+    this._updateCharacter({ 'second_wind_used': boolean })
+  }
   gainXp(xpGained) {
     const updateObject = { 'xp': this._xp + xpGained }
     const xpTable = [300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 14000, 165000, 195000, 225000, 265000, 305000, 355000]
@@ -434,18 +442,29 @@ class ActiveCharacter {
     this._updateCharacter(updateObject)
   }
 
-  spendHitDice() {
+  secondWind() {
+    if (!this.secondWindUsed && (this.currentHp < this.maxHp)) {
+      const hpRegain = min(rollDie(10) + this.level, this.maxHp - this.currentHp)
+      this._updateCharacter({ 'second_wind_used': true, 'current_hp': this.currentHp + hpRegain })
+      addGameEvent(`${this.name} took a deep breath and recovered ${pluralize('hit point', hpRegain, true)}`)
+    }
+  }
+
+  shortRest() {
     let newHp = this.currentHp
     let newHitDice = this.hitDice
+    this.secondWind()
     while (newHitDice > 0 && newHp < this.maxHp) {
-      newHp += rollDie(10) + 3
+      newHp = min(newHp + rollDie(10) + 3, this.maxHp)
       newHitDice--
     }
+    let updateObject = { 'second_wind_used': false }
     if (newHp !== this.currentHp) {
       addGameEvent(`${this.name} rolled ${this.hitDice - newHitDice} hit ${pluralize('die', this.hitDice - newHitDice)} and regained ${pluralize('hit point', newHp - this.currentHp, true)}.`)
       addGameEvent(`${this.name} has ${newHitDice} hit ${pluralize('die', newHitDice)} left.`)
-      this._updateCharacter({ 'current_hp': newHp, 'hit_dice': newHitDice })
+      updateObject = Object.assign(updateObject, { 'current_hp': newHp, 'hit_dice': newHitDice })
     }
+    this._updateCharacter(updateObject)
   }
 
   get maxHp() {
