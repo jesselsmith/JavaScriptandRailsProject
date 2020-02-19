@@ -24,14 +24,16 @@ function setUpSignUpAndLogInButtons() {
 }
 
 function setUpSignUpButton() {
-  document.getElementById("signup-btn").addEventListener("click", () => {
+  document.getElementById("signup-btn").addEventListener("click", e => {
+    disableButtonTemporarily(e.target)
     document.getElementById("login-div").classList.add("hidden")
     document.getElementById("signup-div").classList.remove("hidden")
   })
 }
 
 function setUpLoginButton() {
-  document.getElementById("login-btn").addEventListener("click", () => {
+  document.getElementById("login-btn").addEventListener("click", e => {
+    disableButtonTemporarily(e.target)
     document.getElementById("signup-div").classList.add("hidden")
     document.getElementById("login-div").classList.remove("hidden")
   })
@@ -44,6 +46,7 @@ function setUpSignUpAndLoginForms() {
 
 function setUpSignUpForm() {
   document.getElementById("signup-form").addEventListener("submit", e => {
+    disableButtonTemporarily(e.target)
     e.preventDefault()
     signupInfo = {
       "email": e.target.querySelector("#user_email").value,
@@ -59,6 +62,7 @@ function setUpSignUpForm() {
 
 function setUpLoginForm() {
   document.getElementById("login-form").addEventListener("submit", e => {
+    disableButtonTemporarily(e.target)
     e.preventDefault()
     loginInfo = {
       user: {
@@ -86,7 +90,7 @@ async function fetchPoster(url, body, token = false) {
     headers: headers,
     body: JSON.stringify(body)
   })
-  setToken.call(resp)
+  setToken.call(resp) //whw
   return await resp.json()
 }
 
@@ -142,7 +146,9 @@ function switchLoggedInElements() {
 
 function setUpNewCharacterButton() {
   document.getElementById("new-character-btn").addEventListener("click", () => {
+    disableButtonTemporarily(e.target)
     document.getElementById("new-character-form").addEventListener("submit", e => {
+      disableButtonTemporarily(document.getElementById('add-character'))
       e.preventDefault()
       newCharInfo = {
         character: {
@@ -173,6 +179,7 @@ function addCharacterToList(character) {
 function createCharacterDeleteButton(character) {
   const deleteButton = document.createElement('button')
   deleteButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     fetch(`${BASE_URL}/characters/${character.id}`, {
       method: 'DELETE',
       headers: {
@@ -194,13 +201,14 @@ function createCharacterDeleteButton(character) {
 function createPlayButton(character) {
   const playButton = document.createElement('button')
   playButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     document.getElementById('character-menu').classList.add('hidden')
     document.getElementById('game-summary').classList.add("hidden")
     document.getElementById('gameplay-area').classList.remove('hidden')
     document.getElementById('game-event-display').innerHTML = ''
     monsterStats = document.getElementById('monster-stats')
     monsterStats.innerHTML = ''
-    document.getElementById('change-character').removeAttribute('disabled')
+    document.getElementById('change-character').disabled = false
     activeCharacter = new ActiveCharacter(character)
     const pcStats = document.getElementById('pc-stats')
     pcStats.innerHTML = ''
@@ -216,9 +224,9 @@ function createPlayButton(character) {
       monsterStats.classList.add('hidden')
     }
     if (activeCharacter.secondWindUsed) {
-      document.getElementById('second-wind').setAttribute('disabled', 'disabled')
+      document.getElementById('second-wind').disabled = true
     } else {
-      document.getElementById('second-wind').removeAttribute('disabled')
+      document.getElementById('second-wind').disabled = false
     }
   })
   playButton.textContent = `Play as ${character.attributes.name}, Level: ${character.attributes.level}, HP: ${character.attributes.current_hp} / ${character.attributes.max_hp}`
@@ -243,7 +251,8 @@ function processNewCharacter(json) {
 }
 
 function setUpLogOutButton() {
-  document.getElementById("logout-btn").addEventListener("click", () => {
+  document.getElementById("logout-btn").addEventListener("click", e => {
+    disableButtonTemporarily(e.target)
     fetch(BASE_URL + "/users/sign_out", {
       method: 'DELETE',
       headers: HEADERS
@@ -269,7 +278,7 @@ function removeCharactersFromList() {
 
 function setUpChangeCharacterButton() {
   document.getElementById('change-character').addEventListener('click', e => {
-    e.target.setAttribute('disabled', 'disabled')
+    e.target.disabled = true
     document.getElementById('character-menu').classList.remove("hidden")
   })
 }
@@ -297,6 +306,7 @@ function battleDisplay() {
 function setUpShortRestButton() {
   const shortRestButton = document.getElementById('short-rest')
   shortRestButton.addEventListener('click', () => {
+    disableButtonTemporarily(e.target)
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
     if (interruptTheShortRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to rest!`)
@@ -304,7 +314,7 @@ function setUpShortRestButton() {
       battleDisplay()
     } else {
       activeCharacter.shortRest()
-      document.getElementById('second-wind').removeAttribute('disabled')
+      document.getElementById('second-wind').disabled = false
     }
   })
 }
@@ -316,16 +326,22 @@ function interruptTheShortRest() {
 
 function setUpLongRestButton() {
   const longRestButton = document.getElementById('long-rest')
-  longRestButton.addEventListener('click', () => {
+  longRestButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     if (interruptTheLongRest()) {
       addGameEvent(`${activeCharacter.name} was surpised by an evil creature while trying to sleep!`)
       activeCharacter.fightEvil(true)
       battleDisplay()
     } else {
       activeCharacter.longRest()
-      document.getElementById('second-wind').removeAttribute('disabled')
+      document.getElementById('second-wind').disabled = false
     }
   })
+}
+
+function disableButtonTemporarily(button) {
+  button.disabled = true
+  setTimeout(() => button.disabled = false, 500)
 }
 
 function interruptTheLongRest() {
@@ -348,14 +364,16 @@ function setUpBattleButtons() {
 
 function setUpAttackButton() {
   attackButton = document.getElementById('attack')
-  attackButton.addEventListener('click', () => {
+  attackButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     activeCharacter.attack(activeMonster)
   })
 }
 
 function setUpFleeButton() {
   fleeButton = document.getElementById('flee')
-  fleeButton.addEventListener('click', () => {
+  fleeButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     addGameEvent(`${activeCharacter.name} attempts to flee--${activeMonster.name} takes an attack of opportunity!`)
     activeMonster.attack(activeCharacter, 'disadvantage')
     activeMonster.destroy()
@@ -365,7 +383,8 @@ function setUpFleeButton() {
 
 function setUpDodgeButton() {
   dodgeButton = document.getElementById('dodge')
-  dodgeButton.addEventListener('click', () => {
+  dodgeButton.addEventListener('click', e => {
+    disableButtonTemporarily(e.target)
     activeMonster.attack(activeCharacter, 'disadvantage')
   })
 }
@@ -374,7 +393,7 @@ function setUpSecondWindButton() {
   secondWindButton = document.getElementById('second-wind')
   secondWindButton.addEventListener('click', e => {
     activeCharacter.secondWind()
-    e.target.setAttribute('disabled', 'disabled')
+    e.target.disabled = true
   })
 }
 
