@@ -814,12 +814,13 @@ class ActiveMonster {
 
   dies() {
     addGameEvent(`${this._name} has been defeated!`)
-    activeCharacter.defeatMonster(this.xpGranted, this.gold)
-    this.destroy()
+    this.destroy(() => {
+      activeCharacter.defeatMonster(this.xpGranted, this.gold)
+    })
     leaveBattle()
   }
 
-  destroy() {
+  destroy(callback) {
     fetch(`${BASE_URL}/monsters/${this._id}`, {
       method: 'DELETE',
       headers: {
@@ -830,6 +831,7 @@ class ActiveMonster {
       setToken.call(resp)
       return resp.json()
     }).then(json => {
+      callback()
       activeCharacter.currentMonsterId = 0
     })
   }
