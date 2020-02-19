@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setUpSignUpAndLogInButtons()
   setUpSignUpAndLoginForms()
   setUpLogOutButton()
+  setUpChangeCharacterButton()
   setUpExplorationButtons()
   setUpBattleButtons()
 })
@@ -196,6 +197,7 @@ function createPlayButton(character) {
     document.getElementById('character-menu').classList.add('hidden')
     document.getElementById('game-summary').classList.add("hidden")
     document.getElementById('gameplay-area').classList.remove('hidden')
+    document.getElementById('game-event-display').innerHTML = ''
     activeCharacter = new ActiveCharacter(character)
     const pcStats = document.getElementById('pc-stats')
     pcStats.appendChild(activeCharacter.displayStats())
@@ -243,6 +245,7 @@ function setUpLogOutButton() {
       currentToken = ""
       activeCharacter = null
       activeMonster = null
+      document.getElementById('game-event-display').innerHTML = ''
       document.getElementById('gameplay-area').classList.add('hidden')
       document.getElementById('exploration-buttons').classList.add('hidden')
       document.getElementById('battle-buttons').classList.add('hidden')
@@ -256,6 +259,13 @@ function setUpLogOutButton() {
 
 function removeCharactersFromList() {
   document.getElementById("character-list").innerHTML = ''
+}
+
+function setUpChangeCharacterButton() {
+  document.getElementById('change-character').addEventListener('click', e => {
+    e.target.setAttribute('disabled', 'disabled')
+    document.getElementById('character-menu').classList.remove("hidden")
+  })
 }
 
 function setUpExplorationButtons() {
