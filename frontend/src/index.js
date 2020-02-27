@@ -306,7 +306,7 @@ function battleDisplay() {
 
 function setUpShortRestButton() {
   const shortRestButton = document.getElementById('short-rest')
-  shortRestButton.addEventListener('click', () => {
+  shortRestButton.addEventListener('click', e => {
     disableButtonTemporarily(e.target)
     addGameEvent(`${activeCharacter.name} took a break to rest and heal up.`)
     if (interruptTheShortRest()) {
