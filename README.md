@@ -21,7 +21,7 @@ $ rails secret
 It should generate a long sequence of numbers and letters. Copy that over to the .env file with ‘DEVISE_JWT_SECRET_KEY=’ in front, so that it looks something like this:
 ```
 DEVISE_JWT_SECRET_KEY=a1cce9c68e572ebb6614ab058092570becbdaa0451788eae9445164cc56dc142a92c5eccabe2a7d01784ae758a3392410af839c7f116ab05199961a9820f3840
-``
+```
 Dont use that one though!
 
 To begin play, navigate back to the frontend directory of the application in the terminal (or in your file explorer):
